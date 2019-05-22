@@ -1,0 +1,37 @@
+\documentclass[10pt]{article}
+\usepackage{tikz}
+
+\usetikzlibrary{arrows.meta}
+\tikzset{>={Latex[width=2mm,length=2mm]}}
+
+\begin{document}
+
+\begin{tikzpicture}[scale=2,font=\footnotesize]
+\tikzstyle{s}=[circle,draw,inner sep=2,fill=black]
+\tikzstyle{h}=[circle,draw, inner sep=2]
+    \node[s, label=below:$D$] (d) at (2,2){};
+	\node[s, label=below:$E$] (e) at (0,1){};
+	\node[s, label=above:$M$] (m) at (0,4){};
+	\node[s, label=below:$L$] (l) at (4,4){};
+	\node[s, label=above:$X$] (x) at (2,4){};
+    \node[s, label=right:$Y$] (y) at (6,2){};
+	\node[h, label=above:$U$] (u) at (5,4){};
+
+	% Arrows
+	\draw[->] (x) edge (y);
+    \draw[->] (e) edge (x);
+    \draw[->] (e) to [out=-20,in=-70] (y);
+    \draw[->] (e) edge (m);
+    \draw[->] (l) edge (x);
+    \draw[->] (l) edge (y);
+    %\draw[->] (l) edge (d);
+    %\draw[->] (e) edge (d);
+    \draw[->] (m) edge (x);
+    \draw[->] (x) edge (d);
+    \draw[->] (m) edge (d);
+    \draw[->] (x) edge (y);
+    \draw[->] (u) edge (y);
+    \draw[->] (u) edge (y);
+    \draw[<->] (d) edge (y);
+\end{tikzpicture}
+\end{document}
