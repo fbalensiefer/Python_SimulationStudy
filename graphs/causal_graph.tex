@@ -15,7 +15,7 @@
 	\node[s, label=below:$L$] (l) at (4,4){};
 	\node[s, label=above:$X$] (x) at (2,4){};
     \node[s, label=right:$Y$] (y) at (6,2){};
-	\node[h, label=above:$U$] (u) at (5,4){};
+	\node[h, label=above:$U$] (u) at (4,1){};
 
 	% Arrows
 	\draw[->] (x) edge (y);
@@ -31,7 +31,7 @@
     \draw[->] (m) edge (d);
     \draw[->] (x) edge (y);
     \draw[->] (u) edge (y);
-    \draw[->] (u) edge (y);
+    \draw[->] (u) edge (d);
     \draw[<->] (d) edge (y);
 \end{tikzpicture}
 \end{document}
