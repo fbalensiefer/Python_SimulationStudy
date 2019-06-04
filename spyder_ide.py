@@ -92,41 +92,49 @@ print(df_t.to_string(index=False))
 # Table 4: Representativeness of the Merger Sample
 filter_cols = 'poptot|popdensity|pminority|pcollege|pincome|medincome|pmortgage|cont_totalbranches|cont_brgrowth|cont_total_origin|cont_NumSBL_Rev1'
 df = pd.read_stata('data/alltract_controls.dta')
-index = ['popdensity','poptot','medincome','pminority','pcollege','pmortgage','pincome','cont_totalbranches', 'cont_brgrowth','cont_NumSBL_Rev1','cont_total_origin']
+#index = ['popdensity','poptot','medincome','pminority','pcollege','pmortgage','pincome','cont_totalbranches', 'cont_brgrowth','cont_NumSBL_Rev1','cont_total_origin']
+index = ['popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'pmortgage', 'totalbranches', 'brgrowth', 'NumSBL_Rev1', 'total_origin', 'pincome', 'num_closings']
 df_t = pd.DataFrame(columns=['Variable', 'All', 'Closings', 'Merger'], index=index)
 df.drop_duplicates(keep='first', inplace=True)
+
 df_all = df.loc[df['year']>=2002]
 df_all = df_all.loc[df_all['year']<=2007]
 df_all = df_all.groupby(['state_fps', 'cnty_fps', 'tractstring'])
-df_all = df_all.agg(np.nanmax)
+df_all = df_all.agg(np.max)
 df_all = df_all.loc[df_all['totalbranches']>0]
-df_all = df_all.agg(np.nanmean)
-df_all = df_all.filter(regex=filter_cols).T
-#df_all_index= df_all['state_fps', 'cnty_fps', 'tractstring']
+df_all = df_all.agg(np.mean)
+alltract_index = 'popdensity|poptot|medincome|pminority|pcollege|pmortgage|totalbranches|brgrowth|NumSBL_Rev1|total_origin|pincome|num_closings'
+df_all = df_all.filter(regex=alltract_index)
+
 df_closing = df.loc[df['year']>=2002]
 df_closing = df_closing.loc[df_closing['year']<=2007]
 df_closing = df_closing.groupby(['state_fps', 'cnty_fps', 'tractstring'])
 df_closing = df_closing.agg(np.nanmax)
 df_closing = df_closing.loc[df_closing['num_closings']>0]
 df_closing = df_closing.agg(np.nanmean)
-df_closing = df_closing.filter(regex=filter_cols).T
+df_closing = df_closing.filter(regex=alltract_index).T
+
 df = pd.read_stata('data/replication_input.dta')
 #df_merger      = df.loc[df['year']==2001]
 df_merger = df.loc[df['year']>=2002]
 df_merger = df_merger.loc[df_merger['year']<=2007]
+df01 = pd.read_stata('data/alltract_controls.dta')
+df01.drop_duplicates(keep='first', inplace=True)
+df_merger = pd.merge(df_merger,df01,  on=['state_fps','cnty_fps','tractstring'])
 df_merger = df_merger.groupby(['state_fps', 'cnty_fps', 'tractstring'])
-#df01           = pd.read_stata('data/alltract_controls.dta')
-#df01           = df01.groupby(['state_fps', 'cnty_fps', 'tractstring'])
-#df_merger      = pd.merge(df_merger,df01,  on=['state_fps','cnty_fps','tractstring'])
 df_merger = df_merger.agg(np.nanmax)
 df_merger = df_merger.agg(np.nanmean)
+s = pd.Series(filter_cols)
+snew = pd.Series([...])
+df_merger.set_index([s, snew])
 df_merger = df_merger.filter(regex=filter_cols).T
-#df = df.filter(regex=filter_cols)
+
+
 df_t['Variable']  = list(index)
 df_t['All']       = np.round(df_all, 3)
 df_t['Closings']  = np.round(df_closing, 3)
 df_t['Merger']    = np.round(df_merger, 3)
-#filter_cols = ['poptot','popdensity','pminority','pcollege','pincome','medincome','pmortgage','cont_totalbranches','cont_brgrowth','cont_total_origin','cont_NumSBL_Rev1']
+
 print(df_t.to_string(index=False))
 
 
