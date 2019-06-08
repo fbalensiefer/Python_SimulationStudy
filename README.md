@@ -13,7 +13,6 @@ Additionally, I will try to test for overrepresentation within the sample using 
 
 **To Do:**
 - Get Travis CI for reproducibility
--	Compute p-values to compare groups
 -	Finish summary stats
 -	Begin replication of main results
 -	Apply bootstrap/ resampling to test for overrepresentation
