@@ -6,6 +6,8 @@
 #%reset
 
 # preface loading packages required for Python Data Science
+%reset -f
+%clear
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
@@ -49,16 +51,18 @@ print(df_t.to_string(index=False))
 # todo add standard devidations in brackets
 # Table 3: Summary Statistics for Exposed and Control Tracts
 #df.assign(cntyID = df.sort_values(['state_fps', 'cnty_fps']))
-filter_cols = 'poptot|popdensity|pminority|pcollege|pincome|medincome|pmortgage|cont_totalbranches|cont_brgrowth|cont_total_origin|cont_NumSBL_Rev1'
+filter_cols = 'poptot|popdensity|pminority|pcollege|pincome|medincome|pmortgage|cont_totalbranches|cont_brgrowth|cont_total_origin|cont_NumSBL_Rev1|Obs'
 df = pd.read_stata('data/mergersample_controls.dta')
 index = ['popdensity','poptot','medincome','pminority','pcollege','pmortgage','pincome','cont_totalbranches', 'cont_brgrowth','cont_NumSBL_Rev1','cont_total_origin']
 df_t = pd.DataFrame(columns=['Variable', 'Exposed', 'All other', 'p-value 01', 'Control', 'p-value 02'], index=index)
 df.drop_duplicates(keep='first', inplace=True)
 df_exposed = df.loc[df.overlap==1]
+df_exposed=df_exposed.assign(Obs=lambda df_exposed:len(df_exposed))
 df_exposed = df_exposed.filter(regex=filter_cols).T
 df = pd.read_stata('data/mergersample_controls.dta')
 df.drop_duplicates(keep='first', inplace=True)
 df_all     = df.loc[df.overlap==0]
+df_all=df_all.assign(Obs=lambda df_all:len(df_all))
 df_all     = df_all.filter(regex=filter_cols).T
 df01 = pd.read_stata('data/replication_input.dta')
 df01 = df01.filter(regex='state_fps|cnty_fps|tractstring|overlap|mergerID')
@@ -68,12 +72,14 @@ df02.drop_duplicates(keep='first', inplace=True)
 #df = pd.merge(df01,df02,  on=['state_fps','cnty_fps','tractstring','mergerID'], how='inner', suffixes=('', '_y'))
 df = pd.merge(df01,df02,  on=['state_fps','cnty_fps','tractstring','mergerID'], how='inner')
 df = df.loc[df.overlap_y==0]
-#f_control = df.groupby(['state_fps','cnty_fps'], as_index=True)
-df_control = df.groupby('state_fps')
+df_control = df.groupby(['state_fps','cnty_fps'], as_index=True)
+#df_control = df.groupby('state_fps')
 df_control = df_control.agg(np.mean)
+df_control = df.assign(Obs=lambda df:len(df))
 df_control = df_control.filter(regex=filter_cols).T
 df = df.filter(regex=filter_cols)
 df_t['Variable']  = list(df)
+df_t              = df_t.append({'Variable':'Obs'}, ignore_index=True)
 df_t['Exposed']   = np.round(np.nanmean(df_exposed, axis=1), 3)
 df_t['All other'] = np.round(np.nanmean(df_all, axis=1), 3)
 ptemp = stats.ttest_ind(df_exposed, df_all, axis=1, equal_var=True, nan_policy='omit')
@@ -89,12 +95,11 @@ print(df_t.to_string(index=False))
 ###############################################################################
 
 # todo add standard devidations in brackets
-# todo why are there missing values for some variables
 # Table 4: Representativeness of the Merger Sample
-filter_cols = 'poptot|popdensity|pminority|pcollege|pincome|medincome|pmortgage|cont_totalbranches|cont_brgrowth|cont_total_origin|cont_NumSBL_Rev1'
+filter_cols = 'poptot|popdensity|pminority|pcollege|pincome|medincome|pmortgage|cont_totalbranches|cont_brgrowth|cont_total_origin|cont_NumSBL_Rev1|Obs'
 df = pd.read_stata('data/alltract_controls.dta')
 #index = ['popdensity','poptot','medincome','pminority','pcollege','pmortgage','pincome','cont_totalbranches', 'cont_brgrowth','cont_NumSBL_Rev1','cont_total_origin']
-index = ['popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'pmortgage', 'totalbranches', 'brgrowth', 'NumSBL_Rev1', 'total_origin', 'pincome']
+index = ['popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'pmortgage', 'totalbranches', 'brgrowth', 'NumSBL_Rev1', 'total_origin', 'pincome', 'Obs']
 df_t = pd.DataFrame(columns=['Variable', 'All', 'Closings', 'Merger'], index=index)
 df.drop_duplicates(keep='first', inplace=True)
 
@@ -102,9 +107,11 @@ df_all = df.loc[df['year']>=2002]
 df_all = df_all.loc[df_all['year']<=2007]
 df_all = df_all.groupby(['state_fps', 'cnty_fps', 'tractstring'])
 df_all = df_all.agg(np.nanmax)
+#df_all = df_all.agg(np.nanmean)
 df_all = df_all.loc[df_all['totalbranches']>0]
+df_all['Obs'] = len(df_all)
 df_all = df_all.agg(np.nanmean)
-alltract_index = 'popdensity|poptot|medincome|pminority|pcollege|pmortgage|totalbranches|brgrowth|NumSBL_Rev1|total_origin|pincome'
+alltract_index = 'popdensity|poptot|medincome|pminority|pcollege|pmortgage|totalbranches|brgrowth|NumSBL_Rev1|total_origin|pincome|Obs'
 df_all = df_all.filter(regex=alltract_index)
 
 df_closing = df.loc[df['year']>=2002]
@@ -112,6 +119,7 @@ df_closing = df_closing.loc[df_closing['year']<=2007]
 df_closing = df_closing.groupby(['state_fps', 'cnty_fps', 'tractstring'])
 df_closing = df_closing.agg(np.nanmax)
 df_closing = df_closing.loc[df_closing['num_closings']>0]
+df_closing['Obs'] = len(df_closing)
 df_closing = df_closing.agg(np.nanmean)
 df_closing = df_closing.filter(regex=alltract_index).T
 
@@ -124,11 +132,12 @@ df01.drop_duplicates(keep='first', inplace=True)
 df_merger = pd.merge(df_merger,df01,  on=['state_fps','cnty_fps','tractstring'], how='inner', suffixes=('', '_y'))
 df_merger = df_merger.groupby(['state_fps', 'cnty_fps', 'tractstring'])
 df_merger = df_merger.agg(np.nanmax)
+num= len(df_merger)
 df_merger = df_merger.agg(np.nanmean)
 df_merger.rename(index= {'cont_totalbranches': 'totalbranches', 'cont_brgrowth':'brgrowth', 'cont_NumSBL_Rev1':'NumSBL_Rev1','cont_total_origin':'total_origin'},  inplace = True)
 df_merger = df_merger.filter(regex=alltract_index).T
 df_merger = df_merger.iloc[4:15]
-
+df_merger['Obs'] = num
 
 df_t['Variable']  = list(index)
 df_t['All']       = np.round(df_all, 3)
@@ -137,5 +146,26 @@ df_t['Merger']    = np.round(df_merger, 3)
 
 print(df_t.to_string(index=False))
 
-
 ###############################################################################
+
+# Table 5: Complier Characteristics
+
+filter_cols = 'poptot|popdensity|pminority|pcollege|pincome|medincome|pmortgage|cont_totalbranches|cont_brgrowth|cont_total_origin|cont_NumSBL_Rev1|Obs'
+df = pd.read_stata('data/replication_input.dta')
+index = ['popdensity','poptot','medincome','pminority','pcollege','pmortgage','pincome','cont_totalbranches', 'cont_brgrowth','cont_NumSBL_Rev1','cont_total_origin']
+#index = ['popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'pmortgage', 'totalbranches', 'brgrowth', 'NumSBL_Rev1', 'total_origin', 'pincome', 'Obs']
+#df_t = pd.DataFrame(columns=['Variable', 'All', 'Closings', 'Merger'], index=index)
+df.drop_duplicates(keep='first', inplace=True)
+df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+df=df.loc[df['event_year']==1]
+
+df_nt = df.loc[df['overlap']==0]
+df_nt = df_nt.filter(regex=filter_cols).T
+#df_nt = df_nt.groupby()3
+
+df_at = df.loc[df['overlap']==1]
+df_at = df_at.filter(regex=filter_cols).T
+#df_at = df_at.groupby()
+
+#df_comp = df.loc[df['overlap']==1]
+#df_comp = df_comp.groupby()
