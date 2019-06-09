@@ -88,6 +88,7 @@ df_t['Control']   = np.round(np.nanmean(df_control, axis=1), 3)
 ptemp = stats.ttest_ind(df_exposed, df_control, axis=1, equal_var=True, nan_policy='omit')
 df_t['p-value 02']   = np.round(np.ma.getdata(ptemp[1]), 3)
 filter_cols = ['poptot','popdensity','pminority','pcollege','pincome','medincome','pmortgage','cont_totalbranches','cont_brgrowth','cont_total_origin','cont_NumSBL_Rev1']
+pd.options.display.float_format = '{:.3f}'.format
 print(df_t.to_string(index=False))
 #print(df_control)
 #np.shape(ptemp)
@@ -144,28 +145,59 @@ df_t['All']       = np.round(df_all, 3)
 df_t['Closings']  = np.round(df_closing, 3)
 df_t['Merger']    = np.round(df_merger, 3)
 
+pd.options.display.float_format = '{:.3f}'.format
 print(df_t.to_string(index=False))
 
 ###############################################################################
 
 # Table 5: Complier Characteristics
 
-filter_cols = 'poptot|popdensity|pminority|pcollege|pincome|medincome|pmortgage|cont_totalbranches|cont_brgrowth|cont_total_origin|cont_NumSBL_Rev1|Obs'
+## calculating MEDIAN values
 df = pd.read_stata('data/replication_input.dta')
 index = ['popdensity','poptot','medincome','pminority','pcollege','pmortgage','pincome','cont_totalbranches', 'cont_brgrowth','cont_NumSBL_Rev1','cont_total_origin']
-#index = ['popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'pmortgage', 'totalbranches', 'brgrowth', 'NumSBL_Rev1', 'total_origin', 'pincome', 'Obs']
-#df_t = pd.DataFrame(columns=['Variable', 'All', 'Closings', 'Merger'], index=index)
 df.drop_duplicates(keep='first', inplace=True)
 df=df.assign(event_year=lambda df:df.year-df.yr_approve)
 df=df.loc[df['event_year']==1]
+p50=df[index].median()
 
-df_nt = df.loc[df['overlap']==0]
-df_nt = df_nt.filter(regex=filter_cols).T
-#df_nt = df_nt.groupby()3
+## estimate the proportion of ALWAYS TAKERS, NEVER TAKERS and COMPLIERS
+df_at = df.loc[df['overlap']==0]
+p_always = np.nanmean(df_at.closed_branch)
+df_nt = df.assign(temp=lambda df:1-df.closed_branch)
+df_nt = df_nt.loc[df_nt['overlap']==1]
+p_never = np.nanmean(df_nt.temp)
+p_comp=1-p_always-p_never
 
-df_at = df.loc[df['overlap']==1]
-df_at = df_at.filter(regex=filter_cols).T
-#df_at = df_at.groupby()
+## ESTIMATE AVERAGE CHARACTERISTICS OVER SET OF ALWAYS TAKERS AND COMPLIERS COMBINED (i.e.,Treatment tracts who had closings)
+df_t = pd.DataFrame(index=index)
+df_atcomp = df.loc[df['overlap']==1]
+df_atcomp = df_atcomp.loc[df_atcomp['closed_branch']==1]
+p50=df[index].median()
+n=len(df_atcomp)
+for i in index:
+    temp=df_atcomp[df_atcomp[i]>p50[i]].count()
+    df_t[i]=temp/n
+df_t=df_t.T
+df_atcomp=df_t['poptot']
 
-#df_comp = df.loc[df['overlap']==1]
-#df_comp = df_comp.groupby()
+## ESTIMATE AVERAGE CHARACTERISTICS OVER ALWAYS TAKERS ONLY (i.e., Control tracts who had closings)
+df_at = df.loc[df['overlap']==0]
+df_at = df_at.loc[df_at['closed_branch']==1]
+n=len(df_at)
+for i in index:
+    temp=df_at[df_at[i]>p50[i]].count()
+    df_t[i]=temp/n
+df_t=df_t.T
+df_at=df_t['poptot']
+
+##  ESTIMATE AVERAGE CHARACTERISTICS FOR COMPLIERS
+ecomp=((p_always+p_comp)/p_comp)*(df_atcomp-((p_always/(p_always+p_comp))*df_at))
+## CALCULATE RATIO
+ratio=ecomp/0.5
+## PRINT to Table
+df_t = pd.DataFrame(columns=['Variables','ecomp','ratio'], index=index)
+df_t['Variables']=list(df[index])
+df_t['ecomp']=ecomp
+df_t['ratio']=ratio
+pd.options.display.float_format = '{:.3f}'.format
+print(df_t.to_string(index=False))
