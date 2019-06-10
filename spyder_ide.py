@@ -169,35 +169,65 @@ p_never = np.nanmean(df_nt.temp)
 p_comp=1-p_always-p_never
 
 ## ESTIMATE AVERAGE CHARACTERISTICS OVER SET OF ALWAYS TAKERS AND COMPLIERS COMBINED (i.e.,Treatment tracts who had closings)
-df_t = pd.DataFrame(index=index)
+df_t1 = pd.DataFrame(index=index)
 df_atcomp = df.loc[df['overlap']==1]
 df_atcomp = df_atcomp.loc[df_atcomp['closed_branch']==1]
-p50=df[index].median()
 n=len(df_atcomp)
 for i in index:
     temp=df_atcomp[df_atcomp[i]>p50[i]].count()
-    df_t[i]=temp/n
-df_t=df_t.T
-df_atcomp=df_t['poptot']
+    df_t1[i]=temp/n
+df_t1=df_t1.T
+df_atcomp=df_t1['poptot']
 
 ## ESTIMATE AVERAGE CHARACTERISTICS OVER ALWAYS TAKERS ONLY (i.e., Control tracts who had closings)
+df_t2 = pd.DataFrame(index=index)
 df_at = df.loc[df['overlap']==0]
 df_at = df_at.loc[df_at['closed_branch']==1]
 n=len(df_at)
 for i in index:
     temp=df_at[df_at[i]>p50[i]].count()
-    df_t[i]=temp/n
-df_t=df_t.T
-df_at=df_t['poptot']
+    df_t2[i]=temp/n
+df_t2=df_t2.T
+df_at=df_t2['poptot']
 
 ##  ESTIMATE AVERAGE CHARACTERISTICS FOR COMPLIERS
 ecomp=((p_always+p_comp)/p_comp)*(df_atcomp-((p_always/(p_always+p_comp))*df_at))
 ## CALCULATE RATIO
 ratio=ecomp/0.5
 ## PRINT to Table
-df_t = pd.DataFrame(columns=['Variables','ecomp','ratio'], index=index)
-df_t['Variables']=list(df[index])
-df_t['ecomp']=ecomp
-df_t['ratio']=ratio
+df_tab = pd.DataFrame(columns=['Variables','ecomp','ratio'], index=index)
+df_tab['Variables']=list(df[index])
+df_tab['ecomp']=ecomp*100
+df_tab['ratio']=ratio
 pd.options.display.float_format = '{:.3f}'.format
-print(df_t.to_string(index=False))
+print(df_tab.to_string(index=False))
+
+###############################################################################
+###         Main Results
+###############################################################################
+
+# Figure 2: Exposure to consolidation and the incidence of branch closings
+
+###############################################################################
+
+# Table 6: First-Stage and Reduced-Form estimates 
+
+###############################################################################
+
+# Figure 3: Exposure to consolidation and local branch levels
+
+###############################################################################
+
+# Figure 4: Exposure to consolidation and the volume of new lending
+
+###############################################################################
+
+# (maybe skip Figure 5)
+
+###############################################################################
+
+# Table 7: IV-Estimates of the effect of closings an local credit supply
+
+###############################################################################
+### Remaining Part is not relevant for further analysis
+###############################################################################
