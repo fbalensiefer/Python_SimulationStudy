@@ -9,7 +9,7 @@ Additionally, I will try to test for overrepresentation within the sample using 
 -	Summarize paper findings
 -	Prepare causal graph Tex
 -	Get in touch with the data
--	reproducing summary stats
+-	Reproducing summary stats
 
 **To Do:**
 -	Begin replication of main results
