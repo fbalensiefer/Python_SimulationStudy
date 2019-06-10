@@ -10,6 +10,7 @@
 %clear
 import numpy as np
 import pandas as pd
+import statsmodels.formula.api as smf
 import statsmodels.api as sm
 from patsy import dmatrices
 import matplotlib.pyplot as plt
@@ -208,13 +209,91 @@ print(df_tab.to_string(index=False))
 
 # Figure 2: Exposure to consolidation and the incidence of branch closings
 
+df = pd.read_stata('data/replication_input.dta')
+df.drop_duplicates(keep='first', inplace=True)
+df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+index=list(df)
+dfmean = pd.DataFrame(columns=range(-8, 10), index=index)
+dfstd = pd.DataFrame(columns=range(-8, 10), index=index)
+#df['num_closings']=(df['num_closings']-df['num_closings'].mean())/df['num_closings'].std()
+df['num_closings']=(df['num_closings']-df['num_closings'].min())/(df['num_closings'].max()-df['num_closings'].min())
+for i in range(-8, 11):
+    dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
+    dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
+dfmean=dfmean.T
+dfstd=dfstd.T
+mean=dfmean['num_closings']
+std=dfstd['num_closings']
+plt.errorbar(mean.index, mean, xerr=0.5, yerr=2*std, linestyle='')
+plt.show()  
+
 ###############################################################################
 
 # Table 6: First-Stage and Reduced-Form estimates 
+df = pd.read_stata('data/replication_input.dta')
+df.drop_duplicates(keep='first', inplace=True)
+df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+index=list(df)
+
+## estimates of column 1 (number of closings)
+est_numclose= pd.DataFrame(columns=['beta', 'SE'], index=range(-8, 10))
+beta=pd.DataFrame(index=range(-8, 10))
+std=pd.DataFrame(index=range(-8, 10))
+for i in range(-8, 11):
+    df['D'] = 0
+    df.loc[df['event_year'] >= i , 'D'] = 1
+    temp=df.loc[(df['event_year']==i) & df['overlap']==1]
+    #temp=df.loc[df['overlap']==1]
+    y, x = dmatrices('num_closings ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=temp)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #print(results.summary())
+    beta[i]=results.params[2]
+    std[i]=results.HC0_se[2]
+#pd.options.display.float_format = '{:.3f}'.format
+est_numclose['beta']=beta.T
+est_numclose['SE']=std.T
+
+## estimates of column 2 (total branches)
+est_numclose= pd.DataFrame(columns=['beta', 'SE'], index=range(-8, 10))
+beta=pd.DataFrame(index=range(-8, 10))
+std=pd.DataFrame(index=range(-8, 10))
+for i in range(-8, 11):
+    df['D'] = 0
+    df.loc[df['event_year'] >= i , 'D'] = 1
+    temp=df.loc[(df['event_year']==i) & df['overlap']==1]
+    #temp=df.loc[df['overlap']==1]
+    y, x = dmatrices('totalbranches ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=temp)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #print(results.summary())
+    beta[i]=results.params[2]
+    std[i]=results.HC0_se[2]
+#pd.options.display.float_format = '{:.3f}'.format
+est_numclose['beta']=beta.T
+est_numclose['SE']=std.T
 
 ###############################################################################
 
 # Figure 3: Exposure to consolidation and local branch levels
+
+df = pd.read_stata('data/replication_input.dta')
+df.drop_duplicates(keep='first', inplace=True)
+df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+index=list(df)
+dfmean = pd.DataFrame(columns=range(-8, 10), index=index)
+dfstd = pd.DataFrame(columns=range(-8, 10), index=index)
+#df['cont_totalbranches']=(df['cont_totalbranches']-df['cont_totalbranches'].mean())/df['cont_totalbranches'].std()
+df['cont_totalbranches']=(df['cont_totalbranches']-df['cont_totalbranches'].min())/(df['cont_totalbranches'].max()-df['cont_totalbranches'].min())
+for i in range(-8, 11):
+    dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
+    dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
+dfmean=dfmean.T
+dfstd=dfstd.T
+mean=dfmean['cont_totalbranches']
+std=dfstd['cont_totalbranches']
+plt.errorbar(mean.index, mean, xerr=0.5, yerr=2*std, linestyle='')
+plt.show()  
 
 ###############################################################################
 
