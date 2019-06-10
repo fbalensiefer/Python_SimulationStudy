@@ -9,11 +9,9 @@ Additionally, I will try to test for overrepresentation within the sample using 
 -	Summarize paper findings
 -	Prepare causal graph Tex
 -	Get in touch with the data
--	Begin computing the summary stat tables 
+-	Reproducing summary stats
 
 **To Do:**
-- Get Travis CI for reproducibility
--	Finish summary stats
 -	Begin replication of main results
 -	Apply bootstrap/ resampling to test for overrepresentation
 -	Check causal graph and identification
