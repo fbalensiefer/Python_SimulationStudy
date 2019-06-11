@@ -15,6 +15,7 @@ import statsmodels.api as sm
 from patsy import dmatrices
 import matplotlib.pyplot as plt
 from scipy import stats
+from linearmodels import PanelOLS
 #%matplotlib inline
 
 ###############################################################################
@@ -234,6 +235,10 @@ df = pd.read_stata('data/replication_input.dta')
 df.drop_duplicates(keep='first', inplace=True)
 df=df.assign(event_year=lambda df:df.year-df.yr_approve)
 index=list(df)
+df['group_timeID']= df.groupby(['state_fps', 'cnty_fps', 'year']).grouper.group_info[0]
+df['indivID']= df.groupby(['state_fps', 'cnty_fps', 'tractstring']).grouper.group_info[0]
+df['clustID']= df.groupby(['state_fps', 'cnty_fps']).grouper.group_info[0] 
+df.set_index(['indivID', 'group_timeID'], inplace=True)
 
 ## estimates of column 1 (number of closings)
 est_numclose= pd.DataFrame(columns=['beta', 'SE'], index=range(-8, 10))
@@ -244,9 +249,11 @@ for i in range(-8, 11):
     df.loc[df['event_year'] >= i , 'D'] = 1
     temp=df.loc[(df['event_year']==i) & df['overlap']==1]
     #temp=df.loc[df['overlap']==1]
-    y, x = dmatrices('num_closings ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=temp)
-    model_spec = sm.OLS(y, x)
-    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #y, x = dmatrices('num_closings ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=temp)
+    #model_spec = sm.OLS(y, x)
+    model_spec = PanelOLS(temp.num_closings, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True, time_effects=True)
+    #results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    results = model_spec.fit(cov_type='clustered', cluster_entity=True)
     #print(results.summary())
     beta[i]=results.params[2]
     std[i]=results.HC0_se[2]
@@ -255,9 +262,9 @@ est_numclose['beta']=beta.T
 est_numclose['SE']=std.T
 
 ## estimates of column 2 (total branches)
-est_numclose= pd.DataFrame(columns=['beta', 'SE'], index=range(-8, 10))
-beta=pd.DataFrame(index=range(-8, 10))
-std=pd.DataFrame(index=range(-8, 10))
+est_totalbranches= pd.DataFrame(columns=['beta', 'SE'], index=range(-8, 10))
+#beta=pd.DataFrame(index=range(-8, 10))
+#std=pd.DataFrame(index=range(-8, 10))
 for i in range(-8, 11):
     df['D'] = 0
     df.loc[df['event_year'] >= i , 'D'] = 1
@@ -270,8 +277,8 @@ for i in range(-8, 11):
     beta[i]=results.params[2]
     std[i]=results.HC0_se[2]
 #pd.options.display.float_format = '{:.3f}'.format
-est_numclose['beta']=beta.T
-est_numclose['SE']=std.T
+est_totalbranches['beta']=beta.T
+est_totalbranches['SE']=std.T
 
 ###############################################################################
 
