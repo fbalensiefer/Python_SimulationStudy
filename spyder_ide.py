@@ -249,11 +249,11 @@ for i in range(-8, 11):
     df.loc[df['event_year'] >= i , 'D'] = 1
     temp=df.loc[(df['event_year']==i) & df['overlap']==1]
     #temp=df.loc[df['overlap']==1]
-    #y, x = dmatrices('num_closings ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=temp)
-    #model_spec = sm.OLS(y, x)
-    model_spec = PanelOLS(temp.num_closings, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True, time_effects=True)
-    #results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
-    results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    y, x = dmatrices('num_closings ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=temp)
+    model_spec = sm.OLS(y, x)
+    #model_spec = PanelOLS(temp.num_closings, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
     #print(results.summary())
     beta[i]=results.params[2]
     std[i]=results.HC0_se[2]
@@ -263,22 +263,61 @@ est_numclose['SE']=std.T
 
 ## estimates of column 2 (total branches)
 est_totalbranches= pd.DataFrame(columns=['beta', 'SE'], index=range(-8, 10))
-#beta=pd.DataFrame(index=range(-8, 10))
-#std=pd.DataFrame(index=range(-8, 10))
 for i in range(-8, 11):
     df['D'] = 0
     df.loc[df['event_year'] >= i , 'D'] = 1
     temp=df.loc[(df['event_year']==i) & df['overlap']==1]
-    #temp=df.loc[df['overlap']==1]
     y, x = dmatrices('totalbranches ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=temp)
     model_spec = sm.OLS(y, x)
     results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
-    #print(results.summary())
+    #model_spec = PanelOLS(temp.totalbranches, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
     beta[i]=results.params[2]
     std[i]=results.HC0_se[2]
 #pd.options.display.float_format = '{:.3f}'.format
 est_totalbranches['beta']=beta.T
 est_totalbranches['SE']=std.T
+
+## estimates of column 3 (SBL origin)
+est_SBLorigin= pd.DataFrame(columns=['beta', 'SE'], index=range(-8, 10))
+for i in range(-8, 11):
+    df['D'] = 0
+    df.loc[df['event_year'] >= i , 'D'] = 1
+    temp=df.loc[(df['event_year']==i) & df['overlap']==1]
+    y, x = dmatrices('NumSBL_Rev1 ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=temp)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.NumSBL_Rev1, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    beta[i]=results.params[2]
+    std[i]=results.HC0_se[2]
+#pd.options.display.float_format = '{:.3f}'.format
+est_SBLorigin['beta']=beta.T
+est_SBLorigin['SE']=std.T
+
+## estimates of column 4 (Mortgage origin)
+est_Morigin= pd.DataFrame(columns=['beta', 'SE'], index=range(-8, 10))
+for i in range(-8, 11):
+    df['D'] = 0
+    df.loc[df['event_year'] >= i , 'D'] = 1
+    temp=df.loc[(df['event_year']==i) & df['overlap']==1]
+    y, x = dmatrices('total_origin ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=temp)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    beta[i]=results.params[2]
+    std[i]=results.HC0_se[2]
+#pd.options.display.float_format = '{:.3f}'.format
+est_Morigin['beta']=beta.T
+est_Morigin['SE']=std.T
+
+## finish table 6 by producing a df containing all estimates
+df_t= pd.DataFrame(columns=['Num_closings', 'Total_branches', 'SBL_origin', 'Mortgage_origin'], index=range(-8, 10))
+df_t['Num_closings']      = est_totalbranches['beta']
+df_t['Total_branches']    = est_totalbranches['beta']
+df_t['SBL_origin']        = est_SBLorigin['beta']
+df_t['Mortgage_origin']   = est_Morigin['beta']
 
 ###############################################################################
 
@@ -306,6 +345,44 @@ plt.show()
 
 # Figure 4: Exposure to consolidation and the volume of new lending
 
+## Small Business Lending
+df = pd.read_stata('data/replication_input.dta')
+df.drop_duplicates(keep='first', inplace=True)
+df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+index=list(df)
+dfmean = pd.DataFrame(columns=range(-8, 10), index=index)
+dfstd = pd.DataFrame(columns=range(-8, 10), index=index)
+#df['NumSBL_Rev1']=(df['NumSBL_Rev1']-df['NumSBL_Rev1'].mean())/df['NumSBL_Rev1'].std()
+df['NumSBL_Rev1']=(df['NumSBL_Rev1']-df['NumSBL_Rev1'].min())/(df['NumSBL_Rev1'].max()-df['NumSBL_Rev1'].min())
+for i in range(-8, 11):
+    dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
+    dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
+dfmean=dfmean.T
+dfstd=dfstd.T
+mean=dfmean['NumSBL_Rev1']
+std=dfstd['NumSBL_Rev1']
+plt.errorbar(mean.index, mean, xerr=0.5, yerr=2*std, linestyle='')
+plt.show() 
+
+## Mortgages
+df = pd.read_stata('data/replication_input.dta')
+df.drop_duplicates(keep='first', inplace=True)
+df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+index=list(df)
+dfmean = pd.DataFrame(columns=range(-8, 10), index=index)
+dfstd = pd.DataFrame(columns=range(-8, 10), index=index)
+#df['total_origin']=(df['total_origin']-df['total_origin'].mean())/df['total_origin'].std()
+df['total_origin']=(df['total_origin']-df['total_origin'].min())/(df['total_origin'].max()-df['total_origin'].min())
+for i in range(-8, 11):
+    dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
+    dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
+dfmean=dfmean.T
+dfstd=dfstd.T
+mean=dfmean['total_origin']
+std=dfstd['total_origin']
+plt.errorbar(mean.index, mean, xerr=0.5, yerr=2*std, linestyle='')
+plt.show() 
+
 ###############################################################################
 
 # (maybe skip Figure 5)
@@ -313,6 +390,122 @@ plt.show()
 ###############################################################################
 
 # Table 7: IV-Estimates of the effect of closings an local credit supply
+df = pd.read_stata('data/replication_input.dta')
+df.drop_duplicates(keep='first', inplace=True)
+df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+index=list(df)
+df['close_2yr']=0
+df['close_2yr']=df['closed_branch'].loc[(df.event_year==0) | (df.event_year==1)]
+df['close_2yr'].fillna(0, inplace=True)
+df['POST']=df['event_year'].loc[df.event_year>0]
+df['POST_close']=df.POST * df.close_2yr
+df['POST_expose']= df.POST * df.overlap 
+
+df['group_timeID']= df.groupby(['state_fps', 'cnty_fps', 'year']).grouper.group_info[0]
+df['indivID']= df.groupby(['state_fps', 'cnty_fps', 'tractstring']).grouper.group_info[0]
+df['clustID']= df.groupby(['state_fps', 'cnty_fps']).grouper.group_info[0] 
+df.set_index(['indivID', 'group_timeID'], inplace=True)
+
+## OLS
+    # NumSBL_Rev1
+    y, x = dmatrices('NumSBL_Rev1 ~ POST_close + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=df)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    print(results.summary())
+
+    # AmtSBL_Rev1
+    y, x = dmatrices('AmtSBL_Rev1 ~ POST_close + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=df)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    print(results.summary())
+
+    # total_origin
+    y, x = dmatrices('total_origin ~ POST_close + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=df)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    print(results.summary())
+
+    # loan_amount
+    y, x = dmatrices('loan_amount ~ POST_close + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=df)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    print(results.summary())    
+    
+## Reduced Form
+    # NumSBL_Rev1
+    y, x = dmatrices('total_origin ~ POST_expose + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=df)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    print(results.summary())
+
+    # AmtSBL_Rev1
+    y, x = dmatrices('AmtSBL_Rev1 ~ POST_expose + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=df)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    print(results.summary())
+
+    # total_origin
+    y, x = dmatrices('total_origin ~ POST_expose + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=df)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    print(results.summary())
+
+    # loan_amount
+    y, x = dmatrices('loan_amount ~ POST_expose + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=df)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    print(results.summary())
+    
+## IV ESTIMATION
+    # NumSBL_Rev1 - IV2SLS.from_formula()
+    y, x = dmatrices('NumSBL_Rev1 ~ popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + [POST_close ~ POST_expose]', data=df)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    print(results.summary())
+
+    # AmtSBL_Rev1
+    y, x = dmatrices('AmtSBL_Rev1 ~ popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + [POST_close ~ POST_expose]', data=df)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    print(results.summary())
+
+    # total_origin
+    y, x = dmatrices('total_origin ~ popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + [POST_close ~ POST_expose]', data=df)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    print(results.summary())
+
+    # loan_amount
+    y, x = dmatrices('loan_amount ~ popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + [POST_close ~ POST_expose]', data=df)
+    model_spec = sm.OLS(y, x)
+    results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
+    #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
+    #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
+    print(results.summary())
+
+
 
 ###############################################################################
 ### Remaining Part is not relevant for further analysis

@@ -10,8 +10,12 @@ Additionally, I will try to test for overrepresentation within the sample using 
 -	Prepare causal graph Tex
 -	Get in touch with the data
 -	Reproducing summary stats
+-   Replication of Figures and Main regression-tables (work in progress)
 
 **To Do:**
--	Begin replication of main results
+-	Check how to implement higher dimensional FE (group_timeID & indivID) and clustering on clustID
+-   Check how to put SE in brackets below
+-   Implement 2SLS-IV and check generated POST-Variables 
+-   Why does the normalized Figures look different? 
 -	Apply bootstrap/ resampling to test for overrepresentation
 -	Check causal graph and identification
