@@ -457,7 +457,7 @@ df.set_index(['indivID', 'group_timeID'], inplace=True)
 ## OLS
     # NumSBL_Rev1
     y, x = dmatrices('NumSBL_Rev1 ~ POST_close + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=df)
-    model_spec = sm.OLS(y, x)
+    model_spec = sm.OLS(mod)
     results = model_spec.fit(cov_type='HAC',cov_kwds={'maxlags':1})
     #model_spec = mt.reg(temp, temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], fe_name=['indivID', 'group_timeID'], cluster='clustID')
     #results = model_spec.fit()
