@@ -454,6 +454,17 @@ df['indivID']= df.groupby(['state_fps', 'cnty_fps', 'tractstring']).grouper.grou
 df['clustID']= df.groupby(['state_fps', 'cnty_fps']).grouper.group_info[0] 
 df.set_index(['indivID', 'group_timeID'], inplace=True)
 
+#################################################################################
+
+## OLS
+# NumSBL_Rev1
+y, x = dmatrices('NumSBL_Rev1 ~ POST_close + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=df)
+mod = PanelOLS(y, x, entity_effects=True)
+results = mod.fit(cov_type='clustered', other_effects=['indivID', 'group_timeID'])
+print(results.summary())
+
+#################################################################################
+
 ## OLS
     # NumSBL_Rev1
     y, x = dmatrices('NumSBL_Rev1 ~ POST_close + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth', data=df)

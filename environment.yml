@@ -11,5 +11,8 @@ dependencies:
 - seaborn
 - scipy
 - linearmodels
-#- pip:
-#  - grmpy
+- rpy2
+- pip:
+  - grmpy
+  - linearmodels
+  - rpy2
