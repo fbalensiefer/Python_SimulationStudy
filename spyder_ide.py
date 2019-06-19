@@ -326,6 +326,34 @@ df_t['Mortgage_origin']   = est_Morigin['beta']
 
 ###############################################################################
 
+# Table 6: First-Stage and Reduced-Form estimates 
+df = pd.read_stata('data/replication_input.dta')
+df.drop_duplicates(keep='first', inplace=True)
+df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+index=list(df)
+df['group_timeID']= df.groupby(['state_fps', 'cnty_fps', 'year']).grouper.group_info[0]
+df['indivID']= df.groupby(['state_fps', 'cnty_fps', 'tractstring']).grouper.group_info[0]
+df['clustID']= df.groupby(['state_fps', 'cnty_fps']).grouper.group_info[0] 
+#df.set_index(['indivID', 'group_timeID'], inplace=True)
+
+## estimates of column 1 (number of closings)
+est_numclose= pd.DataFrame(columns=['beta', 'SE'], index=range(-8, 10))
+beta=pd.DataFrame(index=range(-8, 10))
+std=pd.DataFrame(index=range(-8, 10))
+for i in range(-8, 11):
+    df['D'] = 0
+    df.loc[df['event_year'] >= i , 'D'] = 1
+    temp=df.loc[(df['event_year']==i) & df['overlap']==1]
+    model = smf.ols(formula='num_closings ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + C(indivID) + C(group_timeID)', data=temp).fit(cov_type = 'HC2')
+    #print(model.summary())
+    beta[i]=model.params['D']
+    std[i]=model.HC0_se['D']
+pd.options.display.float_format = '{:.3f}'.format
+est_numclose['beta']=beta.T
+est_numclose['SE']=std.T
+
+###############################################################################
+
 # Figure 3: Exposure to consolidation and local branch levels
 
 df = pd.read_stata('data/replication_input.dta')
