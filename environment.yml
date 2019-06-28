@@ -11,6 +11,6 @@ dependencies:
 - scipy
 - linearmodels
 - rpy2
-- pip:
+#- pip:
   - linearmodels
   - rpy2
