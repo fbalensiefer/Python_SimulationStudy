@@ -10,7 +10,5 @@ dependencies:
 - scipy
 - pip
 - pip:
-  - r
-  - r-essentials
   - rpy2
   - tzlocal
