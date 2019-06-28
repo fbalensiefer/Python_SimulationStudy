@@ -5,11 +5,10 @@ dependencies:
 - pandas
 - statsmodels
 - patsy
-- jupyterlab
+#- jupyterlab
 - matplotlib
-- seaborn
 - scipy
-- linearmodels
+#- linearmodels
 - rpy2
 #- pip:
   - linearmodels
