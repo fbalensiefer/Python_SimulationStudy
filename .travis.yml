@@ -8,7 +8,6 @@ bundler_args: --retry 3
 install:
   - sudo apt-get update
   - chmod +x ./utils/travis_miniconda.sh
-  - chmod +x environment.yml
   - ./utils/travis_miniconda.sh
   - PATH="$HOME/miniconda/bin:$PATH"
   - conda env create -f environment.yml

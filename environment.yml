@@ -3,8 +3,7 @@ name: fbalensiefer
 dependencies:
 - numpy
 - pandas
-- statsmodels.formula.api
-- statsmodels.api
+- statsmodels
 - patsy
 - jupyterlab
 - matplotlib
@@ -13,6 +12,5 @@ dependencies:
 - linearmodels
 - rpy2
 - pip:
-  - grmpy
   - linearmodels
   - rpy2
