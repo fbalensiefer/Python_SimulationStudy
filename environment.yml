@@ -3,6 +3,7 @@ name: fbalensiefer
 dependencies:
 - numpy
 - pandas
+- jupyter
 - statsmodels
 - patsy
 - matplotlib
