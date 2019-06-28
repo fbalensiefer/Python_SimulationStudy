@@ -8,4 +8,7 @@ dependencies:
 - patsy
 - matplotlib
 - scipy
-- rpy2
+- pip
+- pip:
+  - rpy2
+  - tzlocal
