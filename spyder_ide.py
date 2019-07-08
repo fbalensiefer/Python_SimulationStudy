@@ -720,3 +720,29 @@ df.set_index(['indivID', 'group_timeID'], inplace=True)
     #model_spec = PanelOLS(temp.total_origin, temp[['D', 'popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'cont_totalbranches', 'cont_brgrowth']], entity_effects=True)
     #results = model_spec.fit(cov_type='clustered', cluster_entity=True)
     print(results.summary())
+
+
+
+## test
+    # Table 6: First-Stage and Reduced-Form estimates 
+df = pd.read_stata('data/replication_input.dta')
+df.drop_duplicates(keep='first', inplace=True)
+df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+index=list(df)
+df['group_timeID']= df.groupby(['state_fps', 'cnty_fps', 'year']).grouper.group_info[0]
+df['indivID']= df.groupby(['state_fps', 'cnty_fps', 'tractstring']).grouper.group_info[0]
+df['clustID']= df.groupby(['state_fps', 'cnty_fps']).grouper.group_info[0] 
+dummy = pd.get_dummies(df['year'])
+chars = ['poptot', 'popdensity', 'pminority', 'pcollege', 'medincome', 'pincome', 'cont_totalbranches', 'cont_brgrowth'] 
+for i in chars:
+    for j in range(1999,2014):
+        name=i+str(j)
+        df[name]=0
+        df[name]=df[i].loc[df['year']==j]
+        
+
+df = df.fillna(0)
+dftemp = df.filter(regex='poptot|popdensity|pminority|pcollege|medincome|pincome|cont_totalbranches|cont_brgrowth')
+dftemp = dftemp.drop(chars, axis=1)  
+controls = list(dftemp)
+controls = "+".join(controls)
