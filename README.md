@@ -20,8 +20,8 @@ The paper by Nguyen 2019 studies whether distance shapes credit allocation. In o
 As result, Nguyen 2019 finds that distance still matters. Bank branch closings lead to a persistence decline for loans to local small business. While the effect for private lending (mortgages) is temporary.
 Additionally, I create a simulated dataset to show the robustness of the identification strategy.
 The paper, data and stata-code is available <a href="https://www.aeaweb.org/articles?id=10.1257/app.20170543">here</a>
-## Causal Tree
-Causal trees break down complex relationships into simple, transparent and easy to interpret graphs. I create a causal tree to show this relationship in the paper’s framework. Especially, to illustrate the authors identification strategy and to discuss potential identification issues.
+## Causal graphs
+Causal graphs break down complex relationships into simple, transparent and easy to interpret graphs. I create a causal graph to show this relationship in the paper’s framework. Especially, to illustrate the authors identification strategy and to discuss potential identification issues.
 ## Simulation Study
 To further emphasize the identification strategy, I create a simulated dataset. This simulated data I later use to check the framework for causal identification of the local average treatment effect (LATE).
 ## References
