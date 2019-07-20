@@ -19,7 +19,7 @@ The scope of this project is to replicate the major findings from the paper "Are
 The paper by Nguyen 2019 studies whether distance shapes credit allocation. In other words, she tests whether a local bank branch help to get access to funding. Since opening and closing decisions for branches are not random, Nguyen uses bank merger as instrument for closings. She designed a difference-in-differences framework to estimate the local average treatment effect (LATE).
 As result, Nguyen 2019 finds that distance still matters. Bank branch closings lead to a persistence decline for loans to local small business. While the effect for private lending (mortgages) is temporary.
 Additionally, I create a simulated dataset to show the robustness of the identification strategy.
-The paper, data and stata-code is available at: <a href="https://www.aeaweb.org/articles?id=10.1257/app.20170543">here</a>
+The paper, data and stata-code is available <a href="https://www.aeaweb.org/articles?id=10.1257/app.20170543">here</a>
 ## Causal Tree
 Causal trees break down complex relationships into simple, transparent and easy to interpret graphs. I create a causal tree to show this relationship in the paper’s framework. Especially, to illustrate the authors identification strategy and to discuss potential identification issues.
 ## Simulation Study

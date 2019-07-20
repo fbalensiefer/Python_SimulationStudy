@@ -177,16 +177,16 @@ def fig2():
     dfstd = pd.DataFrame(columns=range(-8, 10), index=index)
     #df['num_closings']=(df['num_closings']-df['num_closings'].mean())/df['num_closings'].std()
     df['num_closings']=(df['num_closings']-df['num_closings'].min())/(df['num_closings'].max()-df['num_closings'].min())
-    #for i in range(-8, 11):
-    #    dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
-    #    dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
     for i in range(-8, 11):
-        df['D'] = 0
-        df.loc[df['event_year'] >= i , 'D'] = 1
-        temp=df.loc[(df['event_year']==i) & df['overlap']==1]
-        model = smf.ols(formula='num_closings ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + C(indivID) + C(group_timeID)', data=temp).fit(cov_type='HC2')
-        dfmean[i]=model.params['D']
-        dfstd[i]=model.HC2_se['D']
+        dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
+        dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
+    #for i in range(-8, 11):
+    #    df['D'] = 0
+    #    df.loc[df['event_year'] >= i , 'D'] = 1
+    #    temp=df.loc[(df['event_year']==i) & df['overlap']==1]
+    #    model = smf.ols(formula='num_closings ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + C(indivID) + C(group_timeID)', data=temp).fit(cov_type='HC2')
+    #    dfmean[i]=model.params['D']
+    #    dfstd[i]=model.HC2_se['D']
     dfmean=dfmean.T
     dfstd=dfstd.T
     mean=dfmean['num_closings']
@@ -205,19 +205,59 @@ def fig3():
     dfstd = pd.DataFrame(columns=range(-8, 10), index=index)
     #df['cont_totalbranches']=(df['cont_totalbranches']-df['cont_totalbranches'].mean())/df['cont_totalbranches'].std()
     df['totalbranches']=(df['totalbranches']-df['totalbranches'].min())/(df['totalbranches'].max()-df['totalbranches'].min())
-    #for i in range(-8, 11):
-    #    dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
-    #    dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
     for i in range(-8, 11):
-        df['D'] = 0
-        df.loc[df['event_year'] >= i , 'D'] = 1
-        temp=df.loc[(df['event_year']==i) & df['overlap']==1]
-        model = smf.ols(formula='totalbranches ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + C(indivID) + C(group_timeID)', data=temp).fit(cov_type='HC2')
+        dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
+        dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
+    #for i in range(-8, 11):
+    #    df['D'] = 0
+    #    df.loc[df['event_year'] >= i , 'D'] = 1
+    #    temp=df.loc[(df['event_year']==i) & df['overlap']==1]
+    #    model = smf.ols(formula='totalbranches ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + C(indivID) + C(group_timeID)', data=temp).fit(cov_type='HC2')
         #model = smf.ols(formula='totalbranches ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + C(indivID) + C(group_timeID)', data=temp).fit(cov_type='cluster', cov_kwds={'groups': df['clustID']})
-        dfmean[i]=model.params['D']
-        dfstd[i]=model.HC2_se['D']
+    #    dfmean[i]=model.params['D']
+    #    dfstd[i]=model.HC2_se['D']
     dfmean=dfmean.T
     dfstd=dfstd.T
     mean=dfmean['totalbranches']
     std=dfstd['totalbranches']
+    return [mean, std]
+
+def fig4():
+    ## Small Business Lending
+    df = pd.read_stata('data/replication_input.dta')
+    df.drop_duplicates(keep='first', inplace=True)
+    df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+    index=list(df)
+    dfmean = pd.DataFrame(columns=range(-8, 10), index=index)
+    dfstd = pd.DataFrame(columns=range(-8, 10), index=index)
+    #df['NumSBL_Rev1']=(df['NumSBL_Rev1']-df['NumSBL_Rev1'].mean())/df['NumSBL_Rev1'].std()
+    df['NumSBL_Rev1']=(df['NumSBL_Rev1']-df['NumSBL_Rev1'].min())/(df['NumSBL_Rev1'].max()-df['NumSBL_Rev1'].min())
+    for i in range(-8, 11):
+        dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
+        dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
+    dfmean=dfmean.T
+    dfstd=dfstd.T
+    mean=dfmean['NumSBL_Rev1']
+    std=dfstd['NumSBL_Rev1']
+    plt.subplot(2,2,1)
+    plt.errorbar(mean.index, mean, xerr=0.5, yerr=2*std, linestyle='')
+    plt.title('New Small Business loans')
+    #plt.show() 
+
+    ## Mortgages
+    df = pd.read_stata('data/replication_input.dta')
+    df.drop_duplicates(keep='first', inplace=True)
+    df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+    index=list(df)
+    dfmean = pd.DataFrame(columns=range(-8, 10), index=index)
+    dfstd = pd.DataFrame(columns=range(-8, 10), index=index)
+    #df['total_origin']=(df['total_origin']-df['total_origin'].mean())/df['total_origin'].std()
+    df['total_origin']=(df['total_origin']-df['total_origin'].min())/(df['total_origin'].max()-df['total_origin'].min())
+    for i in range(-8, 11):
+        dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
+        dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
+    dfmean=dfmean.T
+    dfstd=dfstd.T
+    mean=dfmean['total_origin']
+    std=dfstd['total_origin']
     return [mean, std]
