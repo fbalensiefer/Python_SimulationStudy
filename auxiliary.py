@@ -6,6 +6,9 @@ from patsy import dmatrices
 import matplotlib.pyplot as plt
 from scipy import stats
 import warnings
+from linearmodels import PanelOLS
+
+np.random.seed(123)
 
 def tab1():
     df = pd.read_stata('data/replication_input.dta')
@@ -237,12 +240,8 @@ def fig4():
         dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
     dfmean=dfmean.T
     dfstd=dfstd.T
-    mean=dfmean['NumSBL_Rev1']
-    std=dfstd['NumSBL_Rev1']
-    plt.subplot(2,2,1)
-    plt.errorbar(mean.index, mean, xerr=0.5, yerr=2*std, linestyle='')
-    plt.title('New Small Business loans')
-    #plt.show() 
+    mean1=dfmean['NumSBL_Rev1']
+    std1=dfstd['NumSBL_Rev1']
 
     ## Mortgages
     df = pd.read_stata('data/replication_input.dta')
@@ -258,6 +257,72 @@ def fig4():
         dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
     dfmean=dfmean.T
     dfstd=dfstd.T
-    mean=dfmean['total_origin']
-    std=dfstd['total_origin']
-    return [mean, std]
+    mean2=dfmean['total_origin']
+    std2=dfstd['total_origin']
+    return [mean1, std1, mean2, std2]
+
+
+
+
+
+
+
+
+
+
+
+
+def panel_sample():
+    columns = ['Y','D','X','L','M','Exp','E','groupID','timeeff']
+    index = list()
+    for i in range(400):
+        for j in range(1999,2013):
+            index.append((i, j))
+    index = pd.MultiIndex.from_tuples(index, names=('indivID', 'year'))
+    df = pd.DataFrame(columns=columns, index=index)
+    eps= np.random.normal(0,0.5,size=5600)
+    # randomly assign a treatment year, 
+    # while only about 60 percent of indiviuals get treatment
+    for j in range(120):
+        cut=np.random.randint(low=2002,high=2010)
+        for i in range(1999, cut):
+            df.loc[(j, i), 'M'] = 0
+        for i in range(cut,2013):
+            df.loc[(j, i), 'M'] = 1
+    for j in range(200,320):
+        cut=np.random.randint(low=2002,high=2010)
+        for i in range(1999, cut):
+            df.loc[(j, i), 'M'] = 0
+        for i in range(cut,2013):
+            df.loc[(j, i), 'M'] = 1
+    # create controls in this case all regressors will be already standardized
+    vars=['X','L','E']
+    for var in vars:
+        df[var]=np.random.normal(size=5600)
+    for i in range(1999,2013):
+        df.loc[(slice(None),i), 't'] = i
+    for i in range(400):
+        df.loc[(i,slice(None)), 'iID'] = i
+    for i in range(400):
+        df.loc[(i,slice(None)), 'iFE'] = np.random.normal()
+    gr1=np.repeat(1,1400)
+    gr2=np.repeat(2,1400)
+    gr3=np.repeat(3,1400)
+    gr4=np.repeat(4,1400)
+    df['groupID']=np.concatenate((gr1,gr2,gr3,gr4), axis=0)
+    df['group_timeID']= df.groupby(['groupID', 't']).grouper.group_info[0]
+    df.loc[pd.isnull(df['M']), 'Exp'] = 0
+    df.loc[pd.isnull(df['Exp']), 'Exp'] = 1
+    df.loc[pd.isnull(df['M']), 'M'] = 0
+    for i in range(1,5):
+        df.loc[df['groupID']==i, 'gFE'] = np.random.normal()
+    for i in range(1999,2013):
+        trend=i/2000
+        df.loc[(slice(None),i), 'timeeff'] =np.random.normal(trend,0.3)
+    df['gtFE']=df.gFE*df.timeeff
+    # let's create the first stage (D is biased due to eps)
+    #df['D']= 1 + 0.6*df['M'] + 0.3*df.X + 0.2*df.E + df.gFE + df.iFE + eps
+    #df.Y= 1 + df.iFE + 0.9*df.D + 0.7*df.X + 0.5*df.E + 0.3*df.L + df.gtFE + eps
+    df['D']= 0.5*df['M'] + eps
+    df.Y= 0.99*df.D + df.gtFE + df.iFE + eps
+    return df

@@ -4,8 +4,8 @@
 ###############################################################################
 
 rm(list=ls())
-setwd('/Users/Fabian/Google Drive/UniBonn/X_Microeconometrics/student-project-fbalensiefer')
-#setwd('C:/Users/fabia/Google Drive/UniBonn/X_Microeconometrics/student-project-fbalensiefer')
+#setwd('/Users/Fabian/Google Drive/UniBonn/X_Microeconometrics/student-project-fbalensiefer')
+setwd('C:/Users/fabia/Google Drive/UniBonn/X_Microeconometrics/student-project-fbalensiefer')
 
 
 # preface loading packages required for R
@@ -132,3 +132,12 @@ model3=paste(model, femodel, collapse='')
 reg=plm(model, df, index=c('indivID','group_timeID'), model='within', effect='twoways')
 #reg=lm(model2, df)
 summary(reg)
+
+# simulation sample
+panel_sample <- read.csv("C:/Users/fabia/Google Drive/UniBonn/X_Microeconometrics/student-project-fbalensiefer/panel_sample.csv")
+panel_sample['DD']=panel_sample$M*panel_sample$Exp
+model='Y ~ DD + c(indivID) + c(group_timeID)'
+reg=lm(model,panel_sample)
+summary(reg)
+femod=felm(Y ~ DD | indivID + group_timeID, data=panel_sample)
+summary(femod)
