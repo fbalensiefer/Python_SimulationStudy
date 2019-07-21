@@ -6,6 +6,7 @@ dependencies:
 - jupyter
 - statsmodels
 - patsy
+- linearmodels
 - matplotlib
 - linearmodels
 - scipy
