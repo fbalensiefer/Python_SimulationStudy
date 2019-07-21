@@ -6,12 +6,11 @@ dependencies:
 - jupyter
 - statsmodels
 - patsy
-- linearmodels
 - matplotlib
-- linearmodels
 - scipy
 - pip
 - r
 - pip:
   - rpy2
   - tzlocal
+  - linearmodels
