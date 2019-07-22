@@ -127,9 +127,12 @@ fixeff='+as.factor(indivID)+as.factor(group_timeID)'
 femodel='| indivID + group_timeID'
 model2=paste(model, fixeff, collapse='')
 model3=paste(model, femodel, collapse='')
+noquote(model)
+noquote(model2)
+noquote(model3)
 #reg = TwoWayFE(y='num_closings', Xs=temp, fe1='indivID', fe2='group_timeID', dt=dt, cluster=FALSE)
-#reg=felm(formula=model3, data=df)
-reg=plm(model, df, index=c('indivID','group_timeID'), model='within', effect='twoways')
+reg=felm(formula=model3, data=df)
+#reg=plm(model, df, index=c('indivID','group_timeID'), model='within', effect='twoways')
 #reg=lm(model2, df)
 summary(reg)
 

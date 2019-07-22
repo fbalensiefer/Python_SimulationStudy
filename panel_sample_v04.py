@@ -77,16 +77,25 @@ df=panel_sample()
 df.to_csv('panel_sample.csv')
 
 df['DD']=df.M*df.Exp
-#model = 'Y ~ 1 + DD + C(iID) + C(group_timeID)'
-#reg = sm.OLS(formula=model, data=df).fit()
-#reg = smf.ols(formula=model, data=df).fit()
-#print(reg.summary())
+df['indivID']=df['iID'].copy()
+df.set_index(['indivID', 'group_timeID'], inplace=True)
 
 mod = PanelOLS(df.Y, df['D'], entity_effects=True, time_effects=True)
 res = mod.fit(cov_type='clustered', cluster_entity=True)
-print('Estimated effect: %2.4f and std. error: %2.4f Note: the true effect is 0.5' %(res.params,res.std_errors))
+print('The naiv approach, which should be biased \n %2.4f \n (%2.4f)' %(res.params,res.std_errors))
 
+mod1 = smf.ols('D ~ M', df)
+res1 = mod1.fit()
+df['predicted']=res1.predict()
+mod2 = PanelOLS(df.Y, df.predicted, entity_effects=True, time_effects=True)
+res2 = mod2.fit()
+print('The naiv IV approach, which identifies the DGP \n First stage: \n %2.4f \n (%2.4f) \n Second stage: \n %2.4f \n (%2.4f)' %(res1.params['M'],res1.bse['M'],res2.params,res2.std_errors))
 
 mod = PanelOLS(df.Y, df['DD'], entity_effects=True, time_effects=True)
 res = mod.fit(cov_type='clustered', cluster_entity=True)
-print('Estimated effect: %2.4f and std. error: %2.4f Note: the true effect is 0.5' %(res.params,res.std_errors))
+print('The reduced form (DD) with Exposure to merger as instrument \n %2.4f \n (%2.4f)' %(res.params,res.std_errors))
+
+mod = PanelOLS(df.Y, df[['DD','X','L','E']], entity_effects=True, time_effects=True)
+res = mod.fit(cov_type='clustered', cluster_entity=True)
+print('The reduced form (DD) with Exposure to merger as instrument and control variables \n %2.4f \n (%2.4f)' %(res.params[0],res.std_errors[0]))
+print('Note: the true effect is 0.5 thus the authors framework should yield reliable results')
