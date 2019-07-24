@@ -189,7 +189,7 @@ def fig2():
         df.loc[(df['event_year'] >= i) & df['overlap']==1, 'D'] = 1
         exog = ['D', 'poptot', 'popdensity', 'pminority', 'pcollege', 'medincome', 'pincome', 'cont_totalbranches', 'cont_brgrowth'] 
         mod = PanelOLS(df.num_closings, df[exog], entity_effects=False, time_effects=True)
-        reg = mod.fit(cov_type='clustered', cluster_entity=False)
+        reg = mod.fit(cov_type='clustered', clusters=df.clustID)
         dfmean[i]=reg.params['D']
         dfstd[i]=reg.std_errors['D']
     dfmean=dfmean.T
@@ -219,7 +219,7 @@ def fig3():
         df.loc[(df['event_year'] >= i) & df['overlap']==1, 'D'] = 1
         exog = ['D', 'poptot', 'popdensity', 'pminority', 'pcollege', 'medincome', 'pincome', 'cont_totalbranches', 'cont_brgrowth'] 
         mod = PanelOLS(df.totalbranches, df[exog], entity_effects=False, time_effects=True)
-        reg = mod.fit(cov_type='clustered', cluster_entity=False)
+        reg = mod.fit(cov_type='clustered', clusters=df.clustID)
         dfmean[i]=reg.params['D']
         dfstd[i]=reg.std_errors['D']
     dfmean=dfmean.T
