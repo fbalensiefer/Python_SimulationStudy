@@ -176,20 +176,22 @@ def fig2():
     df['indivID']= df.groupby(['state_fps', 'cnty_fps', 'tractstring']).grouper.group_info[0]
     df['clustID']= df.groupby(['state_fps', 'cnty_fps']).grouper.group_info[0] 
     index=list(df)
-    dfmean = pd.DataFrame(columns=range(-8, 10), index=index)
-    dfstd = pd.DataFrame(columns=range(-8, 10), index=index)
-    #df['num_closings']=(df['num_closings']-df['num_closings'].mean())/df['num_closings'].std()
-    df['num_closings']=(df['num_closings']-df['num_closings'].min())/(df['num_closings'].max()-df['num_closings'].min())
-    for i in range(-8, 11):
-        dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
-        dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
+    dfmean = pd.DataFrame(columns=range(-8, 8), index=index)
+    dfstd = pd.DataFrame(columns=range(-8, 8), index=index)
+    df['num_closings']=(df['num_closings']-df['num_closings'].mean())/df['num_closings'].std()
+    #df['num_closings']=(df['num_closings']-df['num_closings'].min())/(df['num_closings'].max()-df['num_closings'].min())
     #for i in range(-8, 11):
-    #    df['D'] = 0
-    #    df.loc[df['event_year'] >= i , 'D'] = 1
-    #    temp=df.loc[(df['event_year']==i) & df['overlap']==1]
-    #    model = smf.ols(formula='num_closings ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + C(indivID) + C(group_timeID)', data=temp).fit(cov_type='HC2')
-    #    dfmean[i]=model.params['D']
-    #    dfstd[i]=model.HC2_se['D']
+    #    dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
+    #    dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
+    df = df.set_index(['indivID', 'group_timeID'])
+    for i in range(-8, 8):
+        df['D'] = 0
+        df.loc[(df['event_year'] >= i) & df['overlap']==1, 'D'] = 1
+        exog = ['D', 'poptot', 'popdensity', 'pminority', 'pcollege', 'medincome', 'pincome', 'cont_totalbranches', 'cont_brgrowth'] 
+        mod = PanelOLS(df.num_closings, df[exog], entity_effects=False, time_effects=True)
+        reg = mod.fit(cov_type='clustered', cluster_entity=False)
+        dfmean[i]=reg.params['D']
+        dfstd[i]=reg.std_errors['D']
     dfmean=dfmean.T
     dfstd=dfstd.T
     mean=dfmean['num_closings']
@@ -204,21 +206,22 @@ def fig3():
     df['indivID']= df.groupby(['state_fps', 'cnty_fps', 'tractstring']).grouper.group_info[0]
     df['clustID']= df.groupby(['state_fps', 'cnty_fps']).grouper.group_info[0] 
     index=list(df)
-    dfmean = pd.DataFrame(columns=range(-8, 10), index=index)
-    dfstd = pd.DataFrame(columns=range(-8, 10), index=index)
-    #df['cont_totalbranches']=(df['cont_totalbranches']-df['cont_totalbranches'].mean())/df['cont_totalbranches'].std()
-    df['totalbranches']=(df['totalbranches']-df['totalbranches'].min())/(df['totalbranches'].max()-df['totalbranches'].min())
-    for i in range(-8, 11):
-        dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
-        dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
+    dfmean = pd.DataFrame(columns=range(-8, 8), index=index)
+    dfstd = pd.DataFrame(columns=range(-8, 8), index=index)
+    df['cont_totalbranches']=(df['cont_totalbranches']-df['cont_totalbranches'].mean())/df['cont_totalbranches'].std()
+    #df['totalbranches']=(df['totalbranches']-df['totalbranches'].min())/(df['totalbranches'].max()-df['totalbranches'].min())
     #for i in range(-8, 11):
-    #    df['D'] = 0
-    #    df.loc[df['event_year'] >= i , 'D'] = 1
-    #    temp=df.loc[(df['event_year']==i) & df['overlap']==1]
-    #    model = smf.ols(formula='totalbranches ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + C(indivID) + C(group_timeID)', data=temp).fit(cov_type='HC2')
-        #model = smf.ols(formula='totalbranches ~ D + popdensity + poptot + medincome + pminority + pcollege +  cont_totalbranches + cont_brgrowth + C(indivID) + C(group_timeID)', data=temp).fit(cov_type='cluster', cov_kwds={'groups': df['clustID']})
-    #    dfmean[i]=model.params['D']
-    #    dfstd[i]=model.HC2_se['D']
+    #    dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
+    #    dfstd[i]=df.loc[(df['event_year']==i) & df['overlap']==1].std()
+    df = df.set_index(['indivID', 'group_timeID'])
+    for i in range(-8, 8):
+        df['D'] = 0
+        df.loc[(df['event_year'] >= i) & df['overlap']==1, 'D'] = 1
+        exog = ['D', 'poptot', 'popdensity', 'pminority', 'pcollege', 'medincome', 'pincome', 'cont_totalbranches', 'cont_brgrowth'] 
+        mod = PanelOLS(df.totalbranches, df[exog], entity_effects=False, time_effects=True)
+        reg = mod.fit(cov_type='clustered', cluster_entity=False)
+        dfmean[i]=reg.params['D']
+        dfstd[i]=reg.std_errors['D']
     dfmean=dfmean.T
     dfstd=dfstd.T
     mean=dfmean['totalbranches']
@@ -267,13 +270,8 @@ def fig4():
 
 
 
-
-
-
-
-
 def panel_sample():
-    columns = ['Y','D','X','L','M','Exp','E','groupID','timeeff']
+    columns = ['Y','D','X','M','Exp','E','groupID','timeeff']
     index = list()
     for i in range(400):
         for j in range(1999,2013):
@@ -296,9 +294,10 @@ def panel_sample():
         for i in range(cut,2013):
             df.loc[(j, i), 'M'] = 1
     # create controls in this case all regressors will be already standardized
-    vars=['X','L','E']
-    for var in vars:
-        df[var]=np.random.normal(size=5600)
+    for j in range(400):
+        mu=int(np.random.uniform(1,10,1))
+        for i in range(1999,2013):        
+            df.loc[(j,i), 'X']=np.random.normal(mu,mu/3)
     for i in range(1999,2013):
         df.loc[(slice(None),i), 't'] = i
     for i in range(400):
@@ -310,19 +309,22 @@ def panel_sample():
     gr3=np.repeat(3,1400)
     gr4=np.repeat(4,1400)
     df['groupID']=np.concatenate((gr1,gr2,gr3,gr4), axis=0)
+    for j in range(1,5):
+        mu=int(np.random.uniform(1,10,1))
+        for i in range(1999,2013):        
+            df.loc[(df['groupID']==j)&(df['t']==i), 'E']=np.random.normal(mu,mu/3)
     df['group_timeID']= df.groupby(['groupID', 't']).grouper.group_info[0]
     df.loc[pd.isnull(df['M']), 'Exp'] = 0
     df.loc[pd.isnull(df['Exp']), 'Exp'] = 1
     df.loc[pd.isnull(df['M']), 'M'] = 0
     for i in range(1,5):
+        #mu=int(np.random.uniform(1,10,1))
         df.loc[df['groupID']==i, 'gFE'] = np.random.normal()
     for i in range(1999,2013):
         trend=i/2000
         df.loc[(slice(None),i), 'timeeff'] =np.random.normal(trend,0.3)
     df['gtFE']=df.gFE*df.timeeff
     # let's create the first stage (D is biased due to eps)
-    #df['D']= 1 + 0.6*df['M'] + 0.3*df.X + 0.2*df.E + df.gFE + df.iFE + eps
-    #df.Y= 1 + df.iFE + 0.9*df.D + 0.7*df.X + 0.5*df.E + 0.3*df.L + df.gtFE + eps
     df['D']= 0.5*df['M'] + eps
     df.Y= 0.99*df.D + df.gtFE + df.iFE + eps
     return df

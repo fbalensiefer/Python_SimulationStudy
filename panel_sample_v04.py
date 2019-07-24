@@ -19,7 +19,7 @@ from linearmodels import PanelOLS
 np.random.seed(123)
 
 def panel_sample():
-    columns = ['Y','D','X','L','M','Exp','E','groupID','timeeff']
+    columns = ['Y','D','X','M','Exp','E','groupID','timeeff']
     index = list()
     for i in range(400):
         for j in range(1999,2013):
@@ -42,9 +42,10 @@ def panel_sample():
         for i in range(cut,2013):
             df.loc[(j, i), 'M'] = 1
     # create controls in this case all regressors will be already standardized
-    vars=['X','L','E']
-    for var in vars:
-        df[var]=np.random.normal(size=5600)
+    for j in range(400):
+        mu=int(np.random.uniform(1,10,1))
+        for i in range(1999,2013):        
+            df.loc[(j,i), 'X']=np.random.normal(mu,mu/3)
     for i in range(1999,2013):
         df.loc[(slice(None),i), 't'] = i
     for i in range(400):
@@ -56,19 +57,22 @@ def panel_sample():
     gr3=np.repeat(3,1400)
     gr4=np.repeat(4,1400)
     df['groupID']=np.concatenate((gr1,gr2,gr3,gr4), axis=0)
+    for j in range(1,5):
+        mu=int(np.random.uniform(1,10,1))
+        for i in range(1999,2013):        
+            df.loc[(df['groupID']==j)&(df['t']==i), 'E']=np.random.normal(mu,mu/3)
     df['group_timeID']= df.groupby(['groupID', 't']).grouper.group_info[0]
     df.loc[pd.isnull(df['M']), 'Exp'] = 0
     df.loc[pd.isnull(df['Exp']), 'Exp'] = 1
     df.loc[pd.isnull(df['M']), 'M'] = 0
     for i in range(1,5):
+        #mu=int(np.random.uniform(1,10,1))
         df.loc[df['groupID']==i, 'gFE'] = np.random.normal()
     for i in range(1999,2013):
         trend=i/2000
         df.loc[(slice(None),i), 'timeeff'] =np.random.normal(trend,0.3)
     df['gtFE']=df.gFE*df.timeeff
     # let's create the first stage (D is biased due to eps)
-    #df['D']= 1 + 0.6*df['M'] + 0.3*df.X + 0.2*df.E + df.gFE + df.iFE + eps
-    #df.Y= 1 + df.iFE + 0.9*df.D + 0.7*df.X + 0.5*df.E + 0.3*df.L + df.gtFE + eps
     df['D']= 0.5*df['M'] + eps
     df.Y= 0.99*df.D + df.gtFE + df.iFE + eps
     return df
@@ -78,12 +82,14 @@ df.to_csv('panel_sample.csv')
 
 df['DD']=df.M*df.Exp
 df['indivID']=df['iID'].copy()
+df['gtID']=df['group_timeID'].copy()
 df.set_index(['indivID', 'group_timeID'], inplace=True)
 
 mod = PanelOLS(df.Y, df['D'], entity_effects=True, time_effects=True)
 res = mod.fit(cov_type='clustered', cluster_entity=True)
 print('The naiv approach, which should be biased \n %2.4f \n (%2.4f)' %(res.params,res.std_errors))
 
+#mod1 = smf.ols('D ~ M + X', df)
 mod1 = smf.ols('D ~ M', df)
 res1 = mod1.fit()
 df['predicted']=res1.predict()
@@ -95,7 +101,23 @@ mod = PanelOLS(df.Y, df['DD'], entity_effects=True, time_effects=True)
 res = mod.fit(cov_type='clustered', cluster_entity=True)
 print('The reduced form (DD) with Exposure to merger as instrument \n %2.4f \n (%2.4f)' %(res.params,res.std_errors))
 
-mod = PanelOLS(df.Y, df[['DD','X','L','E']], entity_effects=True, time_effects=True)
+mod = PanelOLS(df.Y, df[['DD','X']], entity_effects=True, time_effects=True)
 res = mod.fit(cov_type='clustered', cluster_entity=True)
 print('The reduced form (DD) with Exposure to merger as instrument and control variables \n %2.4f \n (%2.4f)' %(res.params[0],res.std_errors[0]))
 print('Note: the true effect is 0.5 thus the authors framework should yield reliable results')
+
+
+
+##############################################################################
+df['indivID']=df['iID'].copy()
+df['year']=df['t'].copy()
+df.set_index(['indivID', 'year'], inplace=True)
+mod1 = PanelOLS(df.D, df[['M','X']],entity_effects=True, time_effects=True)
+res1 = mod1.fit()
+df['predicted']=res1.predict()
+df['indivID']=df['iID'].copy()
+df['group_timeID']=df['gtID'].copy()
+df.set_index(['indivID', 'group_timeID'], inplace=True)
+mod2 = PanelOLS(df.Y, df.predicted, entity_effects=True, time_effects=True)
+res2 = mod2.fit()
+print('The authors IV approach, which includes time-varying tract controls \n First stage: \n %2.4f \n (%2.4f) \n Second stage: \n %2.4f \n (%2.4f)' %(res1.params['M'],res1.std_errors['M'],res2.params,res2.std_errors))
