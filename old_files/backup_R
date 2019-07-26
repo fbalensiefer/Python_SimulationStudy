@@ -1,0 +1,39 @@
+# -*- coding: utf-8 -*-
+###############################################################################
+#       Preface
+###############################################################################
+
+rm(list=ls())
+setwd('/Users/Fabian/Google Drive/UniBonn/X_Microeconometrics/student-project-fbalensiefer')
+#setwd('C:/Users/fabia/Google Drive/UniBonn/X_Microeconometrics/student-project-fbalensiefer')
+
+
+# preface loading packages required for R
+library(plm)
+library(lfe)
+#library(haven)
+library(dplyr)
+library(dummies)
+#library(fastDummies)
+
+###############################################################################
+###         Main Results
+###############################################################################
+
+# Table 6: First-Stage and Reduced-Form estimates
+df = read.csv("test_csv.csv")
+df = distinct(df)
+#test=dummy_cols(df, select_columns = c('indivID','group_timeID'))
+temp=colnames(df)
+temp=temp[46:174]
+vars=paste(temp, collapse='+')
+dep='num_closings ~ '
+model= paste(dep, vars, collapse='')
+fixeff='+as.factor(indivID)+as.factor(group_timeID)'
+femodel='| indivID + group_timeID'
+model2=paste(model, fixeff, collapse='')
+model3=paste(model, femodel, collapse='')
+#reg=felm(model3, df)
+#reg=plm(model, df, index=c('indivID','group_timeID'), model='within', effect='twoways')
+reg=lm(model2, df)
+summary(reg)
