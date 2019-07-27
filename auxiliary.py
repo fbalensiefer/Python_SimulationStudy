@@ -192,7 +192,7 @@ def fig2():
     df.set_index(['indivID', 'group_timeID'], inplace=True)
     dftest=df.copy()
     dftest['num_closings']=(dftest['num_closings']-dftest['num_closings'].min())/(dftest['num_closings'].max()-dftest['num_closings'].min())
-    for i in range(-8,9):
+    for i in range(-7,9):
         dum='eD'+str(i)
         dftest[dum]=0
         dftest[dum].loc[(dftest['event_year']==i) & dftest['overlap']==1]=1
@@ -229,7 +229,7 @@ def fig3():
     df.set_index(['indivID', 'group_timeID'], inplace=True)
     dftest=df.copy()
     dftest['totalbranches']=(dftest['totalbranches']-dftest['totalbranches'].min())/(dftest['totalbranches'].max()-dftest['totalbranches'].min())
-    for i in range(-8,9):
+    for i in range(-7,9):
         dum='eD'+str(i)
         dftest[dum]=0
         dftest[dum].loc[(dftest['event_year']==i) & dftest['overlap']==1]=1
@@ -267,7 +267,7 @@ def fig4():
     dftest=df.copy()
     dftest['NumSBL_Rev1']=(dftest['NumSBL_Rev1']-dftest['NumSBL_Rev1'].min())/(dftest['NumSBL_Rev1'].max()-dftest['NumSBL_Rev1'].min())
     dftest['total_origin']=(dftest['total_origin']-dftest['total_origin'].min())/(dftest['total_origin'].max()-dftest['total_origin'].min())
-    for i in range(-8,9):
+    for i in range(-7,9):
         dum='eD'+str(i)
         dftest[dum]=0
         dftest[dum].loc[(dftest['event_year']==i) & dftest['overlap']==1]=1
