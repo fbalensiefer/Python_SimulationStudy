@@ -205,7 +205,7 @@ def fig2():
     std=reg.std_errors[index]
     return [mean, std]
 
-def fig3():
+def fig4():
     df = pd.read_stata('data/replication_input.dta')
     df.drop_duplicates(keep='first', inplace=True)
     df=df.assign(event_year=lambda df:df.year-df.yr_approve)
@@ -228,7 +228,8 @@ def fig3():
     #temp = df.groupby([i, 'year']).grouper.group_info[0]       
     df.set_index(['indivID', 'group_timeID'], inplace=True)
     dftest=df.copy()
-    dftest['totalbranches']=(dftest['totalbranches']-dftest['totalbranches'].min())/(dftest['totalbranches'].max()-dftest['totalbranches'].min())
+    dftest['NumSBL_Rev1']=(dftest['NumSBL_Rev1']-dftest['NumSBL_Rev1'].min())/(dftest['NumSBL_Rev1'].max()-dftest['NumSBL_Rev1'].min())
+    dftest['total_origin']=(dftest['total_origin']-dftest['total_origin'].min())/(dftest['total_origin'].max()-dftest['total_origin'].min())
     for i in range(-8,9):
         dum='eD'+str(i)
         dftest[dum]=0
@@ -237,15 +238,18 @@ def fig3():
     dummylist=list(dftest.filter(regex='eD'))
     exog = dummylist + controllist
     index= dummylist
+    mod1 = PanelOLS(dftest.NumSBL_Rev1, dftest[exog], entity_effects=True, time_effects=True, drop_absorbed=True)
+    reg1 = mod1.fit(cov_type='clustered', clusters=dftest.clustID)
+    mean1=reg1.params[index]
+    std1=reg1.std_errors[index]
+    
+    mod2 = PanelOLS(dftest.total_origin, dftest[exog], entity_effects=True, time_effects=True, drop_absorbed=True)
+    reg2 = mod2.fit(cov_type='clustered', clusters=dftest.clustID)
+    mean2=reg2.params[index]
+    std2=reg2.std_errors[index]
+    return [mean1, std1, mean2, std2]
 
-    mod = PanelOLS(dftest.totalbranches, dftest[exog], entity_effects=True, time_effects=True, drop_absorbed=True)
-    reg = mod.fit(cov_type='clustered', clusters=dftest.clustID)
-
-    mean=reg.params[index]
-    std=reg.std_errors[index]
-    return [mean, std]
-
-def fig4():
+def fig4old():
     ## Small Business Lending
     df = pd.read_stata('data/replication_input.dta')
     df.drop_duplicates(keep='first', inplace=True)
@@ -281,8 +285,78 @@ def fig4():
     std2=dfstd['total_origin']
     return [mean1, std1, mean2, std2]
 
+def tab6():
+    df = pd.read_stata('data/replication_input.dta')
+    df.drop_duplicates(keep='first', inplace=True)
+    df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+    index=list(df)
+    df['group_timeID']= df.groupby(['state_fps', 'cnty_fps', 'year']).grouper.group_info[0]
+    df['indivID']= df.groupby(['state_fps', 'cnty_fps', 'tractstring']).grouper.group_info[0]
+    df['clustID']= df.groupby(['state_fps', 'cnty_fps']).grouper.group_info[0] 
+    dummy = pd.get_dummies(df['year'])
+    chars = ['poptot', 'popdensity', 'pminority', 'pcollege', 'medincome', 'pincome', 'cont_totalbranches', 'cont_brgrowth'] 
+    for i in chars:
+        for j in range(1999,2014):
+            name=i+str(j)
+            df[name]=0
+            df[name]=df[i].loc[df['year']==j]
+    df = df.fillna(0)
+    dftemp = df.filter(regex='poptot|popdensity|pminority|pcollege|medincome|pincome|cont_totalbranches|cont_brgrowth')
+    dftemp = dftemp.drop(chars, axis=1)  
+    controllist = list(dftemp)
+    #df[controllist] = df[controllist].fillna(0)
+    #temp = df.groupby([i, 'year']).grouper.group_info[0]       
+    df.set_index(['indivID', 'group_timeID'], inplace=True)
+    dftest=df.copy()
+    dftest['eDl']=0
+    dftest['eDl'].loc[(dftest['event_year']<-1) & dftest['overlap']==1]=1
+    for i in range(0,7):
+        dum='eD'+str(i)
+        dftest[dum]=0
+        dftest[dum].loc[(dftest['event_year']==i) & dftest['overlap']==1]=1
 
+    dftest['eDu']=0
+    dftest['eDu'].loc[(dftest['event_year']>6) & dftest['overlap']==1]=1
+    dummylist=list(dftest.filter(regex='eD'))
+    exog = dummylist + controllist
+    index=['eDl','eD0','eD1','eD2','eD3','eD4','eD5','eD6','eDu']
+    return [dftest, exog, index]
 
+def tab7():
+    df = pd.read_stata('data/replication_input.dta')
+    df.drop_duplicates(keep='first', inplace=True)
+    df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+    index=list(df)
+    df['close_2yr']=0
+    df['close_2yr']=df['closed_branch'].loc[(df.event_year==0) | (df.event_year==1)]
+    df['close_2yr'].fillna(0, inplace=True)
+    dftemp=df.groupby(['state_fps', 'cnty_fps', 'tractstring', 'overlap', 'mergerID'], sort=False)['close_2yr'].max()
+    df=pd.merge(df,dftemp,on=['state_fps', 'cnty_fps', 'tractstring', 'overlap', 'mergerID'], validate='many_to_one')
+    df['POST']=0
+    df['POST'].loc[df.event_year>0]=1
+    df['POST_close']=df.POST * df.close_2yr_y
+    df['POST_expose']= df.POST * df.overlap 
+    df['group_timeID']= df.groupby(['state_fps', 'cnty_fps', 'year']).grouper.group_info[0]
+    df['indivID']= df.groupby(['state_fps', 'cnty_fps', 'tractstring']).grouper.group_info[0]
+    df['clustID']= df.groupby(['state_fps', 'cnty_fps']).grouper.group_info[0] 
+    dummy = pd.get_dummies(df['year'])
+    chars = ['poptot', 'popdensity', 'pminority', 'pcollege', 'medincome', 'pincome', 'cont_totalbranches', 'cont_brgrowth'] 
+    for i in chars:
+        for j in range(1999,2014):
+            name=i+str(j)
+            df[name]=0
+            df[name]=df[i].loc[df['year']==j]
+
+    dftemp = df.filter(regex='poptot|popdensity|pminority|pcollege|medincome|pincome|cont_totalbranches|cont_brgrowth')
+    dftemp = dftemp.drop(chars, axis=1)  
+    controllist = list(dftemp)
+    #df[controllist] = df[controllist].fillna(0)
+    iID = pd.Categorical(df.indivID)
+    grID = pd.Categorical(df.group_timeID)
+    df = df.set_index(['indivID', 'group_timeID'])
+    df['iID'] = iID
+    df['grID'] = grID
+    return[df, controllist]
 
 
 
