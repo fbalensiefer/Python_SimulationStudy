@@ -205,6 +205,43 @@ def fig2():
     std=reg.std_errors[index]
     return [mean, std]
 
+def fig3():
+    df = pd.read_stata('data/replication_input.dta')
+    df.drop_duplicates(keep='first', inplace=True)
+    df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+    index=list(df)
+    df['group_timeID']= df.groupby(['state_fps', 'cnty_fps', 'year']).grouper.group_info[0]
+    df['indivID']= df.groupby(['state_fps', 'cnty_fps', 'tractstring']).grouper.group_info[0]
+    df['clustID']= df.groupby(['state_fps', 'cnty_fps']).grouper.group_info[0] 
+    dummy = pd.get_dummies(df['year'])
+    chars = ['poptot', 'popdensity', 'pminority', 'pcollege', 'medincome', 'pincome', 'cont_totalbranches', 'cont_brgrowth'] 
+    for i in chars:
+        for j in range(1999,2014):
+            name=i+str(j)
+            df[name]=0
+            df[name]=df[i].loc[df['year']==j]
+    df = df.fillna(0)
+    dftemp = df.filter(regex='poptot|popdensity|pminority|pcollege|medincome|pincome|cont_totalbranches|cont_brgrowth')
+    dftemp = dftemp.drop(chars, axis=1)  
+    controllist = list(dftemp)
+    #df[controllist] = df[controllist].fillna(0)
+    #temp = df.groupby([i, 'year']).grouper.group_info[0]       
+    df.set_index(['indivID', 'group_timeID'], inplace=True)
+    dftest=df.copy()
+    dftest['totalbranches']=(dftest['totalbranches']-dftest['totalbranches'].min())/(dftest['totalbranches'].max()-dftest['totalbranches'].min())
+    for i in range(-8,9):
+        dum='eD'+str(i)
+        dftest[dum]=0
+        dftest[dum].loc[(dftest['event_year']==i) & dftest['overlap']==1]=1
+    dummylist=list(dftest.filter(regex='eD'))
+    exog = dummylist + controllist
+    index= dummylist
+    mod = PanelOLS(dftest.totalbranches, dftest[exog], entity_effects=True, time_effects=True, drop_absorbed=True)
+    reg = mod.fit(cov_type='clustered', clusters=dftest.clustID)
+    mean=reg.params[index]
+    std=reg.std_errors[index]
+    return [mean, std]
+
 def fig4():
     df = pd.read_stata('data/replication_input.dta')
     df.drop_duplicates(keep='first', inplace=True)
