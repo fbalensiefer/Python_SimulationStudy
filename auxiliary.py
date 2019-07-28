@@ -37,17 +37,20 @@ def tab3():
     #df.assign(cntyID = df.sort_values(['state_fps', 'cnty_fps']))
     filter_cols = 'poptot|popdensity|pminority|pcollege|pincome|medincome|pmortgage|cont_totalbranches|cont_brgrowth|cont_total_origin|cont_NumSBL_Rev1|Obs'
     df = pd.read_stata('data/mergersample_controls.dta')
-    index = ['popdensity','poptot','medincome','pminority','pcollege','pmortgage','pincome','cont_totalbranches', 'cont_brgrowth','cont_NumSBL_Rev1','cont_total_origin']
-    df_t = pd.DataFrame(columns=['Variable', 'Exposed', 'All other', 'p-value 01', 'Control', 'p-value 02'], index=index)
+    index = ['popdensity','poptot','medincome','pminority','pcollege','pmortgage','pincome','cont_totalbranches', 'cont_brgrowth','cont_NumSBL_Rev1','cont_total_origin','Obs']
+    df_t = pd.DataFrame(columns=['Variable', 'Exposed', 'Allother', 'pvalue01', 'Control', 'pvalue02'], index=index)
+    std = pd.DataFrame(columns=['a','b','c'], index=index)
     df.drop_duplicates(keep='first', inplace=True)
     df_exposed = df.loc[df.overlap==1]
     df_exposed=df_exposed.assign(Obs=lambda df_exposed:len(df_exposed))
     df_exposed = df_exposed.filter(regex=filter_cols).T
+    std['a']=np.std(df_exposed, axis=1)
     df = pd.read_stata('data/mergersample_controls.dta')
     df.drop_duplicates(keep='first', inplace=True)
     df_all     = df.loc[df.overlap==0]
     df_all=df_all.assign(Obs=lambda df_all:len(df_all))
     df_all     = df_all.filter(regex=filter_cols).T
+    std['b']=np.std(df_all, axis=1)
     df01 = pd.read_stata('data/replication_input.dta')
     df01 = df01.filter(regex='state_fps|cnty_fps|tractstring|overlap|mergerID')
     df01.drop_duplicates(keep='first', inplace=True)
@@ -61,20 +64,20 @@ def tab3():
     df_control = df_control.agg(np.mean)
     df_control = df.assign(Obs=lambda df:len(df))
     df_control = df_control.filter(regex=filter_cols).T
+    std['c']=np.std(df_control, axis=1)
     df = df.filter(regex=filter_cols)
-    df_t['Variable']  = list(df)
-    df_t              = df_t.append({'Variable':'Obs'}, ignore_index=True)
+    df_t['Variable']  = index
+    #df_t              = df_t.append({'Variable':'Obs'}, ignore_index=True)
     df_t['Exposed']   = np.round(np.nanmean(df_exposed, axis=1), decimals=3)
-    df_t['All other'] = np.round(np.nanmean(df_all, axis=1), decimals=3)
+    df_t['Allother'] = np.round(np.nanmean(df_all, axis=1), decimals=3)
     ptemp = stats.ttest_ind(df_exposed, df_all, axis=1, equal_var=True, nan_policy='omit')
-    df_t['p-value 01']   = np.round(np.ma.getdata(ptemp[1]), decimals=3)
+    df_t['pvalue01']   = np.round(np.ma.getdata(ptemp[1]), decimals=3)
     df_t['Control']   = np.round(np.nanmean(df_control, axis=1), decimals=3)
     ptemp = stats.ttest_ind(df_exposed, df_control, axis=1, equal_var=True, nan_policy='omit')
-    df_t['p-value 02']   = np.round(np.ma.getdata(ptemp[1]), decimals=3)
+    df_t['pvalue02']   = np.round(np.ma.getdata(ptemp[1]), decimals=3)
     filter_cols = ['poptot','popdensity','pminority','pcollege','pincome','medincome','pmortgage','cont_totalbranches','cont_brgrowth','cont_total_origin','cont_NumSBL_Rev1']
-    #print(df_control)
-    #np.shape(ptemp)
-    return df_t
+    index.remove('Obs')
+    return [df_t, std, index]
 
 def tab4():
     filter_cols = 'poptot|popdensity|pminority|pcollege|pincome|medincome|pmortgage|cont_totalbranches|cont_brgrowth|cont_total_origin|cont_NumSBL_Rev1|Obs'
@@ -82,25 +85,38 @@ def tab4():
     #index = ['popdensity','poptot','medincome','pminority','pcollege','pmortgage','pincome','cont_totalbranches', 'cont_brgrowth','cont_NumSBL_Rev1','cont_total_origin']
     index = ['popdensity', 'poptot', 'medincome', 'pminority', 'pcollege', 'pmortgage', 'totalbranches', 'brgrowth', 'NumSBL_Rev1', 'total_origin', 'pincome', 'Obs']
     df_t = pd.DataFrame(columns=['Variable', 'All', 'Closings', 'Merger'], index=index)
+    std = pd.DataFrame(columns=['a', 'b', 'c'], index=index)
     df.drop_duplicates(keep='first', inplace=True)
-    df_all = df.loc[df['year']>=2002]
-    df_all = df_all.loc[df_all['year']<=2007]
+    temp=df.loc[df['year']==2001].copy()
+    df_all = df.loc[(df['year']>=2002)&(df['year']<=2007)].copy()
     df_all = df_all.groupby(['state_fps', 'cnty_fps', 'tractstring'])
     df_all = df_all.agg(np.nanmax)
-    #df_all = df_all.agg(np.nanmean)
     df_all = df_all.loc[df_all['totalbranches']>0]
+    df_all = df_all['totalbranches']
+    df_all=pd.merge(temp, df_all, on=['state_fps', 'cnty_fps', 'tractstring'],how='inner', suffixes=('', '_y'))
+    df_all = df_all.loc[df_all['totalbranches_y']>0]
+    df_all = df_all.groupby(['state_fps', 'cnty_fps', 'tractstring'])
+    df_all = df_all.agg(np.nanmean)
     df_all['Obs'] = len(df_all)
+    std['a'] = np.std(df_all)
     df_all = df_all.agg(np.nanmean)
     alltract_index = 'popdensity|poptot|medincome|pminority|pcollege|pmortgage|totalbranches|brgrowth|NumSBL_Rev1|total_origin|pincome|Obs'
     df_all = df_all.filter(regex=alltract_index)
+    df_all = np.round(df_all, decimals=3)
     df_closing = df.loc[df['year']>=2002]
     df_closing = df_closing.loc[df_closing['year']<=2007]
     df_closing = df_closing.groupby(['state_fps', 'cnty_fps', 'tractstring'])
     df_closing = df_closing.agg(np.nanmax)
-    df_closing = df_closing.loc[df_closing['num_closings']>0]
+    df_closing = df_closing['num_closings']
+    df_closing=pd.merge(temp, df_closing, on=['state_fps', 'cnty_fps', 'tractstring'],how='inner', suffixes=('', '_y'))
+    df_closing = df_closing.loc[df_closing['num_closings_y']>0]
+    df_closing = df_closing.groupby(['state_fps', 'cnty_fps', 'tractstring'])
+    df_closing = df_closing.agg(np.nanmean)
     df_closing['Obs'] = len(df_closing)
+    std['b'] = np.std(df_closing)
     df_closing = df_closing.agg(np.nanmean)
     df_closing = df_closing.filter(regex=alltract_index).T
+    df_closing = np.round(df_closing, decimals=3)
     df = pd.read_stata('data/replication_input.dta')
     #df_merger      = df.loc[df['year']==2001]
     df_merger = df.loc[df['year']>=2002]
@@ -108,19 +124,24 @@ def tab4():
     df01 = pd.read_stata('data/alltract_controls.dta')
     df01.drop_duplicates(keep='first', inplace=True)
     df_merger = pd.merge(df_merger,df01,  on=['state_fps','cnty_fps','tractstring'], how='inner', suffixes=('', '_y'))
+    df_merger = pd.merge(temp, df_merger, on=['state_fps','cnty_fps','tractstring'], suffixes=('', '_y'))
     df_merger = df_merger.groupby(['state_fps', 'cnty_fps', 'tractstring'])
-    df_merger = df_merger.agg(np.nanmax)
-    num= len(df_merger)
     df_merger = df_merger.agg(np.nanmean)
-    df_merger.rename(index= {'cont_totalbranches': 'totalbranches', 'cont_brgrowth':'brgrowth', 'cont_NumSBL_Rev1':'NumSBL_Rev1','cont_total_origin':'total_origin'},  inplace = True)
+    df_merger['Obs'] =len(df_merger) 
+    num=len(df_merger)
+    std['c'] = np.std(df_merger[index])
+    df_merger = df_merger.agg(np.nanmean)
+    #df_merger.rename(index= {'cont_totalbranches': 'totalbranches', 'cont_brgrowth':'brgrowth', 'cont_NumSBL_Rev1':'NumSBL_Rev1','cont_total_origin':'total_origin'},  inplace = True)
     df_merger = df_merger.filter(regex=alltract_index).T
-    df_merger = df_merger.iloc[4:15]
+    df_merger = df_merger.iloc[:12]
     df_merger['Obs'] = num
+    df_merger=np.round(df_merger, decimals=3)
     df_t['Variable']  = list(index)
     df_t['All']       = np.round(df_all, decimals=3)
     df_t['Closings']  = np.round(df_closing, decimals=3)
     df_t['Merger']    = np.round(df_merger, decimals=3)
-    return df_t
+    index.remove('Obs')
+    return [df_t, index, std]
 
 def tab5():
     ## calculating MEDIAN values
