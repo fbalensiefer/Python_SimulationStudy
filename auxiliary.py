@@ -458,10 +458,10 @@ def panel_sample():
     gr3=np.repeat(3,1400)
     gr4=np.repeat(4,1400)
     df['groupID']=np.concatenate((gr1,gr2,gr3,gr4), axis=0)
-    for j in range(1,5):
-        mu=int(np.random.uniform(1,10,1))
-        for i in range(1999,2013):        
-            df.loc[(df['groupID']==j)&(df['t']==i), 'E']=np.random.normal(mu,mu/3)
+    #for j in range(1,5):
+    #    mu=int(np.random.uniform(1,10,1))
+    #    for i in range(1999,2013):        
+    #        df.loc[(df['groupID']==j)&(df['t']==i), 'E']=np.random.normal(mu,mu/3)
     df['group_timeID']= df.groupby(['groupID', 't']).grouper.group_info[0]
     df.loc[pd.isnull(df['M']), 'Exp'] = 0
     df.loc[pd.isnull(df['Exp']), 'Exp'] = 1
@@ -474,6 +474,7 @@ def panel_sample():
         df.loc[(slice(None),i), 'timeeff'] =np.random.normal(trend,0.3)
     df['gtFE']=df.gFE*df.timeeff
     # let's create the first stage (D is biased due to eps)
-    df['D']= 0.5*df['M'] + eps
-    df.Y= 0.99*df.D + df.gtFE + df.iFE + eps
+    df['D']= 0.5*df['M'] + 0.2*df.X + eps
+    df.Y= 0.99*df.D + 0.3*df.X + df.gtFE + df.iFE + eps
+    df=df[['Y','D','M','Exp','X','t','iID','group_timeID','groupID']]
     return df
