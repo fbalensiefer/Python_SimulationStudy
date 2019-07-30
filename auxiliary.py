@@ -478,3 +478,67 @@ def panel_sample():
     df.Y= 0.99*df.D + 0.3*df.X + df.gtFE + df.iFE + eps
     df=df[['Y','D','M','Exp','X','t','iID','group_timeID','groupID']]
     return df
+
+
+def fig5():
+    # Figure 5: The effect of subsequent bank entry on local credit supply
+    plt.figure()
+
+    ## Small Business Lending
+    mean=fig3()[0]
+    std=fig3()[1]
+    mean1=fig4()[0]
+    std1=fig4()[1]
+    mean2=fig4()[2]
+    std2=fig4()[3]
+    ind=range(-7,9)
+
+
+    df = pd.read_stata('data/replication_input.dta')
+    df.drop_duplicates(keep='first', inplace=True)
+    df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+    index=list(df)
+    dfmean = pd.DataFrame(columns=range(-7, 9), index=index)
+    #df['NumSBL_Rev1']=(df['NumSBL_Rev1']-df['NumSBL_Rev1'].mean())/df['NumSBL_Rev1'].std()
+    df['NumSBL_Rev1']=(df['NumSBL_Rev1']-df['NumSBL_Rev1'].min())/(df['NumSBL_Rev1'].max()-df['NumSBL_Rev1'].min())
+    df['totalbranches']=(df['totalbranches']-df['totalbranches'].min())/(df['totalbranches'].max()-df['totalbranches'].min())
+    for i in range(-7, 9):
+        dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
+    dfmean=dfmean.T
+    mean=dfmean['NumSBL_Rev1']
+    plt.subplot(1,2,1)
+    plt.axhline(y=0.0, color='lightgrey', linestyle='--')
+    plt.axvline(x=0.0, color='lightgrey', linestyle='--')
+    plt.axvline(x=-4.0, color='lightgrey', linestyle='-')
+    plt.axvline(x=6.0, color='lightgrey', linestyle='-')
+    plt.scatter(mean.index, mean)
+    plt.subplot(1,2,1)
+    plt.scatter(mean.index, dfmean['totalbranches'])
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15))
+    plt.title('New Small Business loans')
+    #plt.show() 
+
+    ## Mortgages
+    df = pd.read_stata('data/replication_input.dta')
+    df.drop_duplicates(keep='first', inplace=True)
+    df=df.assign(event_year=lambda df:df.year-df.yr_approve)
+    index=list(df)
+    dfmean = pd.DataFrame(columns=range(-7, 9), index=index)
+    #df['total_origin']=(df['total_origin']-df['total_origin'].mean())/df['total_origin'].std()
+    df['total_origin']=(df['total_origin']-df['total_origin'].min())/(df['total_origin'].max()-df['total_origin'].min())
+    df['totalbranches']=(df['totalbranches']-df['totalbranches'].min())/(df['totalbranches'].max()-df['totalbranches'].min())
+    for i in range(-7, 9):
+        dfmean[i]=df.loc[(df['event_year']==i) & df['overlap']==1].mean()
+    dfmean=dfmean.T
+    mean=dfmean['total_origin']
+    plt.subplot(1,2,2)
+    plt.axhline(y=0.0, color='lightgrey', linestyle='--')
+    plt.axvline(x=0.0, color='lightgrey', linestyle='--')
+    plt.axvline(x=-4.0, color='lightgrey', linestyle='-')
+    plt.axvline(x=6.0, color='lightgrey', linestyle='-')
+    plt.scatter(mean.index, mean)
+    plt.subplot(1,2,2)
+    plt.scatter(mean.index, dfmean['totalbranches'])
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15))
+    plt.title('New Mortgages')
+    #plt.show()
