@@ -345,7 +345,7 @@ def fig4old():
 
 def tab6():
     df = pd.read_stata('data/replication_input.dta')
-    df.drop_duplicates(keep='first', inplace=True)
+    #df.drop_duplicates(keep='first', inplace=True)
     df=df.assign(event_year=lambda df:df.year-df.yr_approve)
     index=list(df)
     df['group_timeID']= df.groupby(['state_fps', 'cnty_fps', 'year']).grouper.group_info[0]
@@ -360,8 +360,9 @@ def tab6():
             df[name]=df[i].loc[df['year']==j]
     df = df.fillna(0)
     dftemp = df.filter(regex='poptot|popdensity|pminority|pcollege|medincome|pincome|cont_totalbranches|cont_brgrowth')
-    dftemp = dftemp.drop(chars, axis=1)  
-    controllist = list(dftemp)
+    dftemp = dftemp.drop(chars, axis=1) 
+    dflist = dftemp.filter(regex='poptot|popdensity|pminority|pcollege|medincome|cont_totalbranches|cont_brgrowth')
+    controllist = list(dflist)
     #df[controllist] = df[controllist].fillna(0)
     #temp = df.groupby([i, 'year']).grouper.group_info[0]       
     df.set_index(['indivID', 'group_timeID'], inplace=True)

@@ -1,0 +1,238 @@
+		(1)	(2)
+VARIABLES	LABELS	num_closings	totalbranches
+			
+edum_lessm1	edum_lessm1	-0.0120	0.0408
+		(0.0133)	(0.0923)
+edum_0	edum_0	0.0572*	-0.0157
+		(0.0299)	(0.0493)
+edum_1	edum_1	0.216***	-0.301***
+		(0.0348)	(0.0729)
+edum_2	edum_2	0.0140	-0.241***
+		(0.0300)	(0.0881)
+edum_3	edum_3	0.0333	-0.258***
+		(0.0298)	(0.0705)
+edum_4	edum_4	0.0104	0.0169
+		(0.0246)	(0.127)
+edum_5	edum_5	-0.0274	-0.00406
+		(0.0234)	(0.130)
+edum_6	edum_6	-0.0385*	0.00320
+		(0.0230)	(0.129)
+edum_great6	edum_great6	-0.0236	0.0902
+		(0.0153)	(0.123)
+poptot1999	poptot1999	-2.88e-06	-0.000139***
+		(3.94e-06)	(2.78e-05)
+poptot2000	poptot2000	-4.40e-06	-0.000120***
+		(4.73e-06)	(2.72e-05)
+poptot2001	poptot2001	-2.87e-06	-0.000114***
+		(5.42e-06)	(2.55e-05)
+poptot2002	poptot2002	-7.08e-07	-9.73e-05***
+		(4.25e-06)	(2.48e-05)
+poptot2003	poptot2003	2.26e-06	-0.000111***
+		(3.99e-06)	(2.56e-05)
+poptot2004	poptot2004	1.93e-06	-9.52e-05***
+		(4.59e-06)	(2.24e-05)
+poptot2005	poptot2005	6.73e-06	-8.71e-05***
+		(7.09e-06)	(2.10e-05)
+poptot2006	poptot2006	4.57e-06	-8.46e-05***
+		(3.63e-06)	(2.10e-05)
+poptot2007	poptot2007	-3.92e-06	-6.68e-05***
+		(5.45e-06)	(1.85e-05)
+poptot2008	poptot2008	1.25e-06	-3.48e-05**
+		(6.88e-06)	(1.65e-05)
+poptot2009	poptot2009	1.03e-06	-4.81e-05***
+		(4.91e-06)	(1.84e-05)
+poptot2010	poptot2010	-7.01e-06*	-3.88e-05**
+		(4.21e-06)	(1.79e-05)
+poptot2011	poptot2011	-2.97e-06	6.98e-06
+		(5.26e-06)	(5.54e-06)
+poptot2012	poptot2012	-1.39e-07	3.08e-06
+		(4.82e-06)	(4.43e-06)
+o.poptot2013	poptot2013 = o,	-	-
+			
+popdensity1999	popdensity1999	1.17e-06	1.86e-05***
+		(9.38e-07)	(6.80e-06)
+popdensity2000	popdensity2000	-4.75e-07	1.92e-05***
+		(8.11e-07)	(7.09e-06)
+popdensity2001	popdensity2001	4.64e-07	2.03e-05***
+		(8.17e-07)	(7.11e-06)
+popdensity2002	popdensity2002	4.00e-07	1.93e-05***
+		(6.21e-07)	(7.00e-06)
+popdensity2003	popdensity2003	5.48e-08	2.16e-05***
+		(6.24e-07)	(6.90e-06)
+popdensity2004	popdensity2004	7.00e-07	2.19e-05***
+		(4.72e-07)	(7.32e-06)
+popdensity2005	popdensity2005	6.31e-07	1.92e-05**
+		(7.41e-07)	(8.42e-06)
+popdensity2006	popdensity2006	1.10e-07	1.83e-05**
+		(7.04e-07)	(8.39e-06)
+popdensity2007	popdensity2007	1.36e-06	1.77e-05**
+		(9.51e-07)	(8.04e-06)
+popdensity2008	popdensity2008	5.95e-07	1.38e-05*
+		(7.03e-07)	(8.09e-06)
+popdensity2009	popdensity2009	7.50e-07	9.03e-06
+		(4.66e-07)	(6.01e-06)
+popdensity2010	popdensity2010	2.16e-08	9.52e-06*
+		(7.14e-07)	(5.68e-06)
+popdensity2011	popdensity2011	3.60e-07	9.20e-07
+		(6.33e-07)	(8.63e-07)
+popdensity2012	popdensity2012	3.81e-07	-7.33e-07
+		(7.02e-07)	(8.07e-07)
+o.popdensity2013	popdensity2013 = o,	-	-
+			
+pminority1999	pminority1999	-0.127**	0.371
+		(0.0528)	(0.247)
+pminority2000	pminority2000	-0.226***	0.514**
+		(0.0561)	(0.239)
+pminority2001	pminority2001	-0.0562	0.587***
+		(0.0458)	(0.216)
+pminority2002	pminority2002	-0.0600	0.533***
+		(0.0652)	(0.172)
+pminority2003	pminority2003	-0.0624	0.712***
+		(0.0606)	(0.215)
+pminority2004	pminority2004	-0.0585	0.669***
+		(0.0597)	(0.186)
+pminority2005	pminority2005	-0.0482	0.724***
+		(0.0863)	(0.159)
+pminority2006	pminority2006	0.0117	0.700***
+		(0.0538)	(0.159)
+pminority2007	pminority2007	0.0104	0.689***
+		(0.0576)	(0.155)
+pminority2008	pminority2008	-0.0439	0.470***
+		(0.0604)	(0.177)
+pminority2009	pminority2009	-0.0542	0.494***
+		(0.0529)	(0.175)
+pminority2010	pminority2010	-0.0338	0.475**
+		(0.0749)	(0.187)
+pminority2011	pminority2011	-0.00632	0.136**
+		(0.0570)	(0.0657)
+pminority2012	pminority2012	0.00535	0.151***
+		(0.0567)	(0.0448)
+o.pminority2013	pminority2013 = o,	-	-
+			
+pcollege1999	pcollege1999	-0.160**	-1.132***
+		(0.0781)	(0.360)
+pcollege2000	pcollege2000	-0.00935	-1.049***
+		(0.0847)	(0.357)
+pcollege2001	pcollege2001	-0.0395	-1.215***
+		(0.0955)	(0.352)
+pcollege2002	pcollege2002	-0.0193	-1.439***
+		(0.0974)	(0.341)
+pcollege2003	pcollege2003	-0.0173	-1.489***
+		(0.109)	(0.416)
+pcollege2004	pcollege2004	-0.0897	-1.329***
+		(0.0722)	(0.309)
+pcollege2005	pcollege2005	0.0895	-1.106***
+		(0.0888)	(0.303)
+pcollege2006	pcollege2006	-0.0552	-0.945***
+		(0.0814)	(0.295)
+pcollege2007	pcollege2007	0.000284	-0.628**
+		(0.0922)	(0.314)
+pcollege2008	pcollege2008	-0.0102	-0.311
+		(0.109)	(0.289)
+pcollege2009	pcollege2009	0.0486	-0.417
+		(0.0930)	(0.282)
+pcollege2010	pcollege2010	-0.0210	-0.347
+		(0.0916)	(0.285)
+pcollege2011	pcollege2011	0.00834	0.0109
+		(0.0752)	(0.118)
+pcollege2012	pcollege2012	-0.00142	-0.0366
+		(0.0886)	(0.0884)
+o.pcollege2013	pcollege2013 = o,	-	-
+			
+medincome1999	medincome1999	-1.31e-07	-4.20e-06
+		(5.62e-07)	(3.17e-06)
+medincome2000	medincome2000	-2.26e-06***	-2.62e-06
+		(7.37e-07)	(3.06e-06)
+medincome2001	medincome2001	-2.34e-07	2.92e-07
+		(7.03e-07)	(3.05e-06)
+medincome2002	medincome2002	-6.44e-07	1.94e-06
+		(7.13e-07)	(3.12e-06)
+medincome2003	medincome2003	-9.98e-07	3.68e-06
+		(8.84e-07)	(3.43e-06)
+medincome2004	medincome2004	-4.60e-07	4.25e-06
+		(6.44e-07)	(2.96e-06)
+medincome2005	medincome2005	-8.95e-07	4.50e-06
+		(8.94e-07)	(2.96e-06)
+medincome2006	medincome2006	-2.84e-07	3.83e-06
+		(6.99e-07)	(3.23e-06)
+medincome2007	medincome2007	-9.71e-08	3.44e-06
+		(7.04e-07)	(3.01e-06)
+medincome2008	medincome2008	5.15e-07	-1.28e-06
+		(9.62e-07)	(2.86e-06)
+medincome2009	medincome2009	-3.51e-07	1.77e-06
+		(6.79e-07)	(2.86e-06)
+medincome2010	medincome2010	5.00e-07	1.30e-06
+		(8.51e-07)	(2.74e-06)
+medincome2011	medincome2011	5.29e-09	3.41e-08
+		(6.69e-07)	(9.22e-07)
+medincome2012	medincome2012	3.93e-07	7.04e-07
+		(7.84e-07)	(5.78e-07)
+o.medincome2013	medincome2013 = o,	-	-
+			
+cont_totalbranches1999	cont_totalbranches1999	-0.00763	-0.171***
+		(0.00859)	(0.0381)
+cont_totalbranches2000	cont_totalbranches2000	-0.00135	-0.134***
+		(0.00467)	(0.0373)
+cont_totalbranches2001	cont_totalbranches2001	-0.00271	-0.104***
+		(0.00392)	(0.0365)
+cont_totalbranches2002	cont_totalbranches2002	0.000543	-0.0665*
+		(0.00612)	(0.0354)
+cont_totalbranches2003	cont_totalbranches2003	-0.00477	0.0290
+		(0.00338)	(0.0291)
+cont_totalbranches2004	cont_totalbranches2004	-0.0138***	0.0616**
+		(0.00329)	(0.0254)
+cont_totalbranches2005	cont_totalbranches2005	0.00194	0.0868***
+		(0.00638)	(0.0229)
+cont_totalbranches2006	cont_totalbranches2006	-0.00434	0.143***
+		(0.00341)	(0.0264)
+cont_totalbranches2007	cont_totalbranches2007	-0.000135	0.173***
+		(0.00418)	(0.0236)
+cont_totalbranches2008	cont_totalbranches2008	0.00203	0.0932**
+		(0.00499)	(0.0417)
+cont_totalbranches2009	cont_totalbranches2009	0.0150**	0.0755*
+		(0.00621)	(0.0388)
+cont_totalbranches2010	cont_totalbranches2010	0.0115*	0.0687
+		(0.00601)	(0.0441)
+cont_totalbranches2011	cont_totalbranches2011	0.00621	-0.0728
+		(0.00518)	(0.0474)
+cont_totalbranches2012	cont_totalbranches2012	0.00256	-0.0766
+		(0.00509)	(0.0464)
+cont_totalbranches2013	cont_totalbranches2013	-0.0121***	-0.0855*
+		(0.00423)	(0.0456)
+cont_brgrowth1999	cont_brgrowth1999	-0.0486**	-2.312***
+		(0.0244)	(0.230)
+cont_brgrowth2000	cont_brgrowth2000	-0.0240	-2.408***
+		(0.0354)	(0.215)
+cont_brgrowth2001	cont_brgrowth2001	-0.0665*	-2.536***
+		(0.0371)	(0.195)
+cont_brgrowth2002	cont_brgrowth2002	-0.118**	-1.790***
+		(0.0491)	(0.146)
+cont_brgrowth2003	cont_brgrowth2003	-0.0852**	-0.463
+		(0.0335)	(0.294)
+cont_brgrowth2004	cont_brgrowth2004	-0.0613*	-0.341
+		(0.0330)	(0.318)
+cont_brgrowth2005	cont_brgrowth2005	0.0717	0.707***
+		(0.0438)	(0.179)
+cont_brgrowth2006	cont_brgrowth2006	0.00840	1.244***
+		(0.0312)	(0.102)
+cont_brgrowth2007	cont_brgrowth2007	0.0526	1.229***
+		(0.0463)	(0.118)
+cont_brgrowth2008	cont_brgrowth2008	0.0943	1.162***
+		(0.0726)	(0.137)
+cont_brgrowth2009	cont_brgrowth2009	0.0976	1.544***
+		(0.0621)	(0.529)
+cont_brgrowth2010	cont_brgrowth2010	-0.00325	1.431***
+		(0.0344)	(0.474)
+cont_brgrowth2011	cont_brgrowth2011	0.0111	0.785***
+		(0.0236)	(0.175)
+cont_brgrowth2012	cont_brgrowth2012	0.0314	0.878***
+		(0.0391)	(0.168)
+cont_brgrowth2013	cont_brgrowth2013	0.0359	0.877***
+		(0.0341)	(0.170)
+Constant	Constant	0.154***	4.377***
+		(0.0269)	(0.107)
+			
+Observations		51,285	51,278
+R-squared		0.221	0.855
+Robust standard errors in parentheses			
+*** p<0.01, ** p<0.05, * p<0.1			
