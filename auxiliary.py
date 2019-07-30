@@ -420,7 +420,7 @@ def tab7():
 
 
 def panel_sample():
-    columns = ['Y','D','X','M','Exp','E','groupID','timeeff']
+    columns = ['Y','D','X','M','Exp','groupID','timeeff']
     index = list()
     for i in range(400):
         for j in range(1999,2013):
