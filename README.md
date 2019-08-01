@@ -25,13 +25,15 @@ Causal graphs break down complex relationships into simple, transparent and easy
 ## Simulation Study
 To further emphasize the identification strategy, I create a simulated dataset. This simulated data I later use to check the framework for causal identification of the local average treatment effect (LATE).
 ## References
-*Degryse, H., & Ongena, S. (2005). Distance, lending relationships, and competition. The Journal of Finance, 60(1), 231-266.*
+*Akerlof, G. A. (1970). The market for lemons: Quality and the market mechanism. Quarterly. Journal Economics, 84, 488-500.*
+
+*Angrist, J. D., & Pischke, J. S. (2008). Mostly harmless econometrics: An empiricist's companion. Princeton university press.*
 
 *Frölich, M., & Sperlich, S. (2019). Impact evaluation. Cambridge University Press.*
 
 *Nguyen, H. L. Q. (2019). Are credit markets still local? evidence from bank branch closings. American Economic Journal: Applied Economics, 11(1), 1-32.*
 
-*Petersen, M. A., & Rajan, R. G. (2002). Does distance still matter? The information revolution in small business lending. The journal of Finance, 57(6), 2533-2570.*
+*Stiglitz, J. E., & Weiss, A. (1981). Credit rationing in markets with imperfect information. The American economic review, 71(3), 393-410.*
 
 *Wooldridge, J. M. (2015). Introductory econometrics: A modern approach. Nelson Education.*
 
