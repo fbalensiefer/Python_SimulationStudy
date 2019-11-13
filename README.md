@@ -1,13 +1,13 @@
 # Student Project – Fabian Balensiefer
 ## Replication Study: *"Are Credit Markets Still Local? Evidence from Bank Branch Closings"* by Hoai-Luu Q. Nguyen
 
-<a href="https://nbviewer.jupyter.org/github/HumanCapitalAnalysis/student-project-fbalensiefer/blob/master/fbalensiefer.ipynb"
+<a href="https://nbviewer.jupyter.org/github/fbalensiefer/Python_SimulationStudy/blob/master/fbalensiefer.ipynb"
    target="_parent">
    <img align="center"
   src="https://raw.githubusercontent.com/jupyter/design/master/logos/Badges/nbviewer_badge.png"
       width="109" height="20">
 </a>
-<a href="https://mybinder.org/v2/gh/HumanCapitalAnalysis/student-project-fbalensiefer/master?filepath=fbalensiefer.ipyn"
+<a href="https://mybinder.org/v2/gh/fbalensiefer/Python_SimulationStudy/blob/master/fbalensiefer.ipynb"
     target="_parent">
     <img align="center"
        src="https://mybinder.org/badge_logo.svg"
@@ -38,4 +38,4 @@ To further emphasize the identification strategy, I create a simulated dataset. 
 *Wooldridge, J. M. (2015). Introductory econometrics: A modern approach. Nelson Education.*
 
 
-[![Build Status](https://travis-ci.org/HumanCapitalAnalysis/student-project-fbalensiefer.svg?branch=master)](https://travis-ci.org/HumanCapitalAnalysis/student-project-fbalensiefer) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](HumanCapitalAnalysis/student-project-fbalensiefer/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/fbalensiefer/Python_SimulationStudy) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](HumanCapitalAnalysis/student-project-fbalensiefer/blob/master/LICENSE)
