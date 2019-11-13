@@ -38,4 +38,4 @@ To further emphasize the identification strategy, I create a simulated dataset. 
 *Wooldridge, J. M. (2015). Introductory econometrics: A modern approach. Nelson Education.*
 
 
-[![Build Status](https://travis-ci.org/fbalensiefer/Python_SimulationStudy) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](HumanCapitalAnalysis/student-project-fbalensiefer/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/fbalensiefer/Python_SimulationStudy.svg?branch=master)](https://travis-ci.org/fbalensiefer/Python_SimulationStudy)
